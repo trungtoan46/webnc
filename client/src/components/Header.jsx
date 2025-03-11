@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from "@iconify/react";
-const Header = () => {
+import Logo from '../components/Logo';  // Import Logo vào Home
+
+const Header = ({ theme = 'light' }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isDealOpen, setIsDealOpen] = useState(false);
@@ -10,11 +12,11 @@ const Header = () => {
 
 
   return (
-    <header className="rounded-lg bg-white">
+    <header className={`rounded-lg ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
       <nav className="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <Link to="/" className="font-semibold text-center text-xl px-4 mx-auto mb-2">Trang chủ</Link>
+          <Link to="/"><Logo /></Link>
         </div>
 
         {/* Mobile menu button */}
