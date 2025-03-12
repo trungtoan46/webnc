@@ -1,9 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
-      "./views/**/*.ejs", // Quét tất cả file EJS trong thư mục views
-      "./public/**/*.js",  // Nếu có JS custom trong thư mục public
       "./src/**/*.{js,jsx,ts,tsx}",
+      "./public/index.html",
     ],
     theme: {
       extend: {
