@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000/api', // Cập nhật địa chỉ đúng của server
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -56,15 +57,24 @@ const getProductById = async (id) => {
 };
 
 // Thêm sản phẩm vào giỏ hàng
-const addToCart = async (productData) => {
+const addToCart = async ({ productId, quantity }) => {
   try {
-    const response = await api.post('/cart', productData);
+    console.log('Adding to cart:', { productId, quantity }); // Kiểm tra dữ liệu gửi đi
+    
+    const response = await api.post('/cart', {
+      productId,
+      quantity
+    });
+
+    console.log('Response:', response.data); // Kiểm tra phản hồi từ API
+
     return response.data;
   } catch (error) {
-    console.error('Error adding product to cart:', error);
+    console.error('Error adding product to cart:', error.response?.data || error.message);
     throw error;
   }
 };
+
 
 // Lấy thông tin giỏ hàng
 const getCart = async () => {

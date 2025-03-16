@@ -23,7 +23,7 @@ const Dropdown = ({ title, items }) => {
       </div>
       
       {isOpen && (
-        <div className="absolute left-0 w-60 rounded-lg shadow-lg bg-white z-20">
+        <div className="absolute left-0 w-full md:w-60 rounded-lg shadow-lg bg-white z-20">
           <div className="py-1">
             {items.map((item, index) => (
               <Link
