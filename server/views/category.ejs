@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <div class="flex w-3/4 mx-auto justify-end items-center mt-4">
+        <button onclick="" class="text-xl px-4 py-1 mx-2 bg-blue-500 text-white rounded hover:bg-blue-600 add_button" >
+            Thêm danh mục</button>
+    </div>  
+
+
+    <div class="flex justify-center">
+        <table class="w-3/4 mt-4 border border-gray-300 shadow-md rounded-lg overflow-hidden ">
+            <thead class="bg-gray-100">
+                <tr class="text-gray-700 text-center">
+                    <th class="py-3 px-4 border">STT</th>
+                    <th class="py-3 px-4 border">Tên Danh Mục</th>
+                    <th class="py-3 px-4 border">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                <% if (Array.isArray(categories) && categories.length > 0) { %>
+                    <% categories.forEach((category, index) => { %>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-3 px-4 border"><%= index + 1 %></td>
+                            <td class="py-3 px-4 border"><%= category.name %></td>
+                            <td class="py-3 px-4 border space-x-1">
+                                <button type="button" data-name="<%= category.name %>" class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm update">
+                                    Update
+                                </button>
+                                <a href="javascript:void(0);" onclick="deleteCategory('<%= category._id %>')" 
+                                    class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
+                                    Delete
+                                 </a>
+                                 
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5" class="py-3 px-4 text-gray-500">Không có danh mục nào</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+        
+        <div class="w-1/4 mx-auto mt-6 bg-white p-6 shadow-md rounded-lg absolute add_category block">
+            <div class="flex flex-row justify-between">
+                <h2 class="text-xl font-bold mb-4">Thêm Danh Mục</h2>
+                <button class="exit text-xl font-bold mb-4" onclick="">Exit</button>
+            </div>
+            <form id="addCategoryForm" class="space-y-4">
+                <div>
+                    <label class="block font-semibold">Tên Danh Mục</label>
+                    <input type="text" id="categoryName" class="w-full border p-2 rounded" required>
+                </div>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Thêm Danh Mục</button>
+                <button type="button" class="px-4 py-2 float-right randCategory text-white bg-blue-400 hover:bg-blue-600">Thêm danh mục ngẫu nhiên</button>
+            </form>
+        </div>
+        
+
+        <div class="absolute m-auto hidden w-1/4 bg-white border rounded-lg p-6 shadow-sm update_category" >
+            <div class="flex flex-row justify-between">
+                <h2 class="text-xl font-bold mb-4">Cập Nhật Danh Mục</h2>
+                <button class="exit_update text-xl font-bold mb-4" onclick="">Exit</button>
+            </div>
+            <form id="updateCategoryForm" class="space-y-4">
+                <div>
+                    <label class="block font-semibold">Tên Danh Mục</label>
+                    <input type="text" id="updateCategoryName" class="w-full border p-2 rounded" required>
+                </div>
+                <button type="submit" class="px-4 py-2 udpate_button bg-blue-500 text-white rounded hover:bg-blue-600">Cập Nhật Danh Mục</button>
+            </form>
+        </div>
+        
+        
+            
+        
+    </div>
+        <script>
+
+            const update_category = document.querySelector('.update_category');
+            update_category.style.display = 'none';
+            document.querySelector('.exit_update').addEventListener('click', () =>{
+                update_category.style.display = 'none'
+            })
+            document.querySelector('.update').addEventListener('click', function() {
+                update_category.style.display = 'block';
+                const categoryName = this.getAttribute("data-name"); // Lấy dữ liệu từ button
+                document.getElementById("updateCategoryName").value = categoryName; // Gán vào input
+            });
+
+            document.querySelector('.udpate_button').addEventListener('click', async function (event) {
+                const updateName = document.querySelector('.updateCategoryName').value;
+                try{
+                    const response = await fetch("/api/categories", {
+                        method: "PUT",
+                        headers:{
+                            "Content-type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: updateName 
+                        })
+                    });
+                    const result = response.json()
+                    console.log(result)
+                    if (response.ok){
+                        alert('Cập nhật danh mục thành công')
+                    }else{
+                        alert('Thêm danh mục thất bại '+ result.message)
+                    }
+                }catch (error){
+                    console.error("Lỗi khi gửi dữ liệu:", error);
+                    alert("Có lỗi xảy ra, vui lòng thử lại! " + error.message);
+                }
+            })
+
+            const add_category = document.querySelector('.add_category');
+            add_category.style.display = 'none';
+            document.querySelector('.exit').addEventListener('click', () => {
+                add_category.style.display = 'none';
+            })
+            document.querySelector('.add_button').addEventListener('click', () => {
+                add_category.style.display = 'block';
+            })
+
+            document.querySelector(".randCategory").addEventListener('click',async function (event) {
+                try{
+                    const response = await fetch("/api/categories/rnd", {
+                        method: "POST",
+                        headers: {
+                            "Content-type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name
+                        })
+                    });
+                    const result = await response.json();
+                    document.getElementById("categoryName").value = result;
+
+                }catch{
+
+                }
+
+            })
+
+            document.getElementById("addCategoryForm").addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const name = document.getElementById('categoryName').value;
+                console.log(name)
+
+                try{
+                    const response = await fetch("/api/categories", {
+                        method: "POST",
+                        headers: {
+                            "Content-type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name,
+                            
+                        })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Thêm danh mục thành công!");
+                        window.location.reload();
+                    } else {
+                        alert("Thêm danh mục thất bại: " + result.message);
+                    }
+
+                } catch (error) {
+                    console.error("Lỗi khi gửi dữ liệu:", error);
+                    alert("Có lỗi xảy ra, vui lòng thử lại! " + error.message);
+                }
+            });
+
+
+        </script>
+
+<script>
+    async function deleteCategory(categoryId) {
+      if (confirm("Bạn có chắc muốn xóa danh mục này không?")) {
+        try {
+          const response = await fetch(`/api/category/${categoryId}`, { method: 'DELETE' });
+          const result = await response.json();
+          alert(result.message);
+          location.reload(); // Tải lại trang sau khi xóa
+        } catch (error) {
+          console.error("Lỗi khi xóa danh mục:", error);
+          alert("Lỗi khi xóa danh mục!");
+        }
+      }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+
+# Dependency directories
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+out/
+*.bundle.js
+*.min.js
+
+# Debug logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Coverage directories
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# Miscellaneous
+.cache/
+.tmp/
+.temp/
