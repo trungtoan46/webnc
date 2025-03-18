@@ -31,7 +31,7 @@
                             <td class="py-3 px-4 border"><%= index + 1 %></td>
                             <td class="py-3 px-4 border"><%= category.name %></td>
                             <td class="py-3 px-4 border space-x-1">
-                                <button type="button" data-name="<%= category.name %>" class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm update">
+                                <button type="button" data-name="<%= category.name %>" class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm update" id="update">
                                     Update
                                 </button>
                                 <a href="javascript:void(0);" onclick="deleteCategory('<%= category._id %>')" 
@@ -91,10 +91,19 @@
             document.querySelector('.exit_update').addEventListener('click', () =>{
                 update_category.style.display = 'none'
             })
-            document.querySelector('.update').addEventListener('click', function() {
-                update_category.style.display = 'block';
-                const categoryName = this.getAttribute("data-name"); // Lấy dữ liệu từ button
-                document.getElementById("updateCategoryName").value = categoryName; // Gán vào input
+            document.addEventListener("DOMContentLoaded", function () {
+                const updateButtons = document.querySelectorAll('.update');
+                if (updateButtons.length > 0) {
+                    updateButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            console.log("Nút update được click!");
+                            update_category.style.display = 'block';
+                            const categoryName = this.getAttribute("data-name"); // Lấy dữ liệu từ button
+                            document.getElementById("updateCategoryName").value = categoryName; // Gán vào input
+                        });
+                    });
+                } else {
+                }
             });
 
             document.querySelector('.udpate_button').addEventListener('click', async function (event) {
@@ -153,10 +162,8 @@
 
             document.getElementById("addCategoryForm").addEventListener('submit', async function (event) {
                 event.preventDefault();
-
                 const name = document.getElementById('categoryName').value;
                 console.log(name)
-
                 try{
                     const response = await fetch("/api/categories", {
                         method: "POST",
@@ -171,7 +178,6 @@
                     const result = await response.json();
                     if (response.ok) {
                         alert("Thêm danh mục thành công!");
-                        window.location.reload();
                     } else {
                         alert("Thêm danh mục thất bại: " + result.message);
                     }
@@ -186,19 +192,33 @@
         </script>
 
 <script>
-    async function deleteCategory(categoryId) {
-      if (confirm("Bạn có chắc muốn xóa danh mục này không?")) {
-        try {
-          const response = await fetch(`/api/category/${categoryId}`, { method: 'DELETE' });
-          const result = await response.json();
-          alert(result.message);
-          location.reload(); // Tải lại trang sau khi xóa
-        } catch (error) {
-          console.error("Lỗi khi xóa danh mục:", error);
-          alert("Lỗi khi xóa danh mục!");
+    const deleteCategory = async (categoryId) => {
+    try {
+        const response = await fetch(`/api/categories/${categoryId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete category');
         }
-      }
+
+        // Remove the category from UI after successful deletion
+        const element = document.querySelector(`[data-id="${categoryId}"]`);
+        if (element) {
+            element.remove();
+        }
+        
+        // Show success message
+        alert('Xóa danh mục thành công');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Lỗi khi xóa danh mục');
     }
+};
+
 </script>
 </body>
 </html>

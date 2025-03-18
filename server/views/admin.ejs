@@ -248,19 +248,28 @@
 
 <script>
 
-  async function deleteProduct(productId) {
+async function deleteProduct(productId) {
     if (confirm("Bạn có chắc muốn xóa sản phẩm này không?")) {
-      try {
-        const response = await fetch(`/api/product/${productId}`, { method: 'DELETE' });
-        const result = await response.json();
-        alert(result.message);
-        location.reload(); // Tải lại trang sau khi xóa
-      } catch (error) {
-        console.error("Lỗi khi xóa sản phẩm:", error);
-        alert("Lỗi khi xóa sản phẩm!");
-      }
+        try {
+            const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message);
+                document.getElementById(`product-${productId}`).remove(); // Xóa khỏi giao diện
+            } else {
+                alert("Xóa sản phẩm thất bại: " + result.message);
+            }
+        } catch (error) {
+            if (error.name === "CastError") {
+                alert("ID sản phẩm không hợp lệ");  
+            }
+            alert("Lỗi server", error.message);
+        }
+
     }
-  }
+}
+
 </script>
 
 

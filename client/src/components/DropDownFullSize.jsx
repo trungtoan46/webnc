@@ -10,7 +10,7 @@ const DropDownFullSize = ({ title, items }) => {
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <div className="flex items-center font-semibold text-lg text-black hover:text-blue-600 px-4 py-2">
+      <div className="flex items-center font-semibold text-lg text-black hover:text-blue-600 px-4 py-2 cursor-pointer">
         {title}
         <svg
           className={`ml-2 w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
