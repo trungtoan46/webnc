@@ -12,6 +12,26 @@ const Home = () => {
       name: "Áo thun",
       image: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_1.png?v=107",
     },
+    {
+      name: "Áo sơ mi",
+      image: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_2.png?v=107",
+    },
+    {
+      name: "Áo khoác",
+      image: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_3.png?v=107",
+    },
+    {
+      name: "Áo khoác",
+      image: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_3.png?v=107",
+    },  
+    {
+      name: "Áo khoác",
+      image: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_3.png?v=107",
+    },
+    {
+      name: "Áo khoác",
+      image: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_3.png?v=107",
+    },
   ];
   
   const benefitsData = [

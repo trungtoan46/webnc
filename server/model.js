@@ -2,7 +2,7 @@
     const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 
-
+ // Category Schema
     const CategorySchema = new mongoose.Schema({
         name: {
             type: String,
@@ -24,12 +24,10 @@
             type: Number,
             default: 0,
         },
-
-        
-
     });
 
 
+    // Product Schema
     const ProductSchema = new mongoose.Schema({
         name: {
             type: String,
@@ -63,32 +61,75 @@
     });
     ProductSchema.plugin(AutoIncrement, { inc_field: 'product_id' });
 
+
+
+
+    // Cart Schema
+    const CartSchema = new mongoose.Schema({
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        product_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product',
+            required: true,
+        },
+        quantity: { 
+            type: Number,
+            required: true,
+        },
+        created_at: {
+            type: Date,
+            default: Date.now,
+        },
+    });
+    CartSchema.plugin(AutoIncrement, { inc_field: 'cart_id' });
+
+    // User Schema
+    const UserSchema = new mongoose.Schema({
+        username: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        password: { 
+            type: String,
+            required: true,
+        },
+        created_at: {
+            type: Date,
+            default: Date.now,
+        },
+    });
+    UserSchema.plugin(AutoIncrement, { inc_field: 'user_id' });
+
+    //Voucher Schema
+    const VoucherSchema = new mongoose.Schema({
+        code: {
+            type: String,
+            required: true,
+        },
+        discount: {
+            type: Number,
+            required: true,
+        },  
+        created_at: {
+            type: Date,
+            default: Date.now,
+        },
+    });
+    VoucherSchema.plugin(AutoIncrement, { inc_field: 'voucher_id' });
+
+
+
     const Product = mongoose.model('Product', ProductSchema);
     const Category = mongoose.model('Category', CategorySchema);
+    const Cart = mongoose.model('Cart', CartSchema);
+    const User = mongoose.model('User', UserSchema);
+    const Voucher = mongoose.model('Voucher', VoucherSchema);
 
-    // const createCategory = async () => {
-    //     const category = new Category({
-    //     name: 'Mèo kiểng',
-    //     });
-    //     await category.save();
-    //     console.log('Category đã được thêm vào database');
-    // };
-    
-   
-    // createCategory();
-    // const addProduct = async () => {
-    //     const product = new Product({
-    //         name: "Husky Alaska",
-    //         price: 12000000,
-    //         description: "Chó Husky dễ thương, 3 tháng tuổi",
-    //         image_url: "https://example.com/husky.jpg",
-    //         category_id: "67bc119f5c629a61e416be4f",  
-    //     });
-    //     await product.save();
-    //     console.log('✅ Product đã được thêm:');
-    // };
-
-    // addProduct();
     
   
-    module.exports = { Category, Product };
+    module.exports = { Category, Product, Cart, User, Voucher };

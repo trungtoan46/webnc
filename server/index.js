@@ -18,7 +18,6 @@ connectDB();
 const { Category, Product } = require('./model');
 const { create } = require('domain');
 const e = require('express');
-const {getCategory, getBreedName} = require('./apiTheCat');
 const { title } = require('process');
 const {crop} =require('./img/crop')
 
@@ -26,8 +25,8 @@ const {crop} =require('./img/crop')
 const cors = require('cors');
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Hoặc domain frontend của bạn
-  credentials: true // QUAN TRỌNG: Cho phép gửi cookie
+  origin: 'http://localhost:5173', // Hoặc domain frontend
+  credentials: true //Cho phép gửi cookie
 }));
 
 
