@@ -4,8 +4,16 @@ import Footer from '../components/Footer';
 import Banner from '../components/Banner';
 import Slide from '../components/Slide';
 import CustomerBenefits from '../components/customer-benefits';
+import ProductCollection from '../components/ProductCollection';
 
 const Home = () => {
+  const categories = [
+    {
+      name: "Áo thun",
+      image: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_1.png?v=107",
+    },
+  ];
+  
   const benefitsData = [
     {
       icon: "https://theme.hstatic.net/200000696635/1001257291/14/policies_icon_1.png?v=107",
@@ -33,6 +41,7 @@ const Home = () => {
         <div className='w-full'>
             <Slide />
             <CustomerBenefits benefits={benefitsData} />
+            <ProductCollection categories={categories} />
         </div>
     );
 };

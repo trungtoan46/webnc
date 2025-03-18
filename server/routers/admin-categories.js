@@ -49,6 +49,7 @@ router.put('/:id', async (req, res) => {
 router.post('/', async (req, res) =>{
   try{
     const name = req.body.name;
+    const image = req.body.image;
     const created_at = new Date();
     const updated_at = new Date();
 
@@ -59,7 +60,7 @@ router.post('/', async (req, res) =>{
     // Check if category already exists
     const existingCategory = await Category.findOne({ name });
     if (!existingCategory) {
-      const newCategory = new Category({ name, created_at, updated_at });
+      const newCategory = new Category({ name, image, created_at, updated_at });
       await newCategory.save();
       res.status(201).json({ message: "Thêm danh mục thành công" });
     }else{
@@ -70,20 +71,5 @@ router.post('/', async (req, res) =>{
   }
 });
 
-//random
-router.post('/rnd', async (req, res) =>{
-  try{
-    const radCategories = await getBreedName();
-    res.status(200).json(radCategories);
-  }catch (error){
-    console.log(error);
-    res.status(500).json({ message: "Error retrieving random category", error: error.message });
-  }
-});
-
-// Place the 404 handler LAST
-router.use(function (req, res, next) {
-  res.status(404).json({ message: "Page Not Found" });
-});
 
 module.exports = router;

@@ -60,8 +60,11 @@
                     <label class="block font-semibold">Tên Danh Mục</label>
                     <input type="text" id="categoryName" class="w-full border p-2 rounded" required>
                 </div>
+                <div>
+                    <label class="block font-semibold">Ảnh</label>
+                    <input type="text" id="categoryImage" class="w-full border p-2 rounded" required>
+                </div>
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Thêm Danh Mục</button>
-                <button type="button" class="px-4 py-2 float-right randCategory text-white bg-blue-400 hover:bg-blue-600">Thêm danh mục ngẫu nhiên</button>
             </form>
         </div>
         
@@ -163,6 +166,7 @@
             document.getElementById("addCategoryForm").addEventListener('submit', async function (event) {
                 event.preventDefault();
                 const name = document.getElementById('categoryName').value;
+                const image = document.getElementById('categoryImage').value;
                 console.log(name)
                 try{
                     const response = await fetch("/api/categories", {
@@ -172,7 +176,7 @@
                         },
                         body: JSON.stringify({
                             name,
-                            
+                            image
                         })
                     });
                     const result = await response.json();
