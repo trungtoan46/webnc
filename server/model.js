@@ -122,8 +122,11 @@
     });
     VoucherSchema.plugin(AutoIncrement, { inc_field: 'voucher_id' });
 
-
-
+    const userSchema = new mongoose.Schema({
+        username: { type: String, required: true, unique: true },
+        password: { type: String, required: true },
+    });
+    
     const Product = mongoose.model('Product', ProductSchema);
     const Category = mongoose.model('Category', CategorySchema);
     const Cart = mongoose.model('Cart', CartSchema);

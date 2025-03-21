@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import api from '../services/api';
-import { addToCart } from '../services/api';
+import api from '../services/api/api';
+import { addToCart } from '../services/api/api';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -85,7 +85,7 @@ const ProductDetail = () => {
                 className="bg-gray-200 px-3 py-1 rounded-l"
               >
                 -
-              </button>
+              </button> 
               <input 
                 type="number" 
                 id="quantity"
