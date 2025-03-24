@@ -10,6 +10,7 @@ import Admin from './pages/Admin'
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from "./context/AuthContext";
 import Login from './pages/Login'
+import Register from './pages/Register'
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
                   } 
                 />
               <Route path="/login" element={<Login />} />
+              <Route path='/register' element={<Register />} />
                 
               {/* Add more routes as needed */}
             </Routes>
