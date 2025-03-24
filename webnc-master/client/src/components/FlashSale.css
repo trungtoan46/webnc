@@ -1,0 +1,100 @@
+.flashsale__header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .flash-sale-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .flashsale__title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff4d4f;
+    margin: 0;
+  }
+  
+  .flashsale__title .link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .flashsale__title .ega-dot {
+    display: inline-block;
+    position: relative;
+    margin-left: 5px;
+  }
+  
+  .flashsale__title .ega-ping {
+    width: 8px;
+    height: 8px;
+    background-color: #ff4d4f;
+    border-radius: 50%;
+    animation: ping 1.5s infinite;
+  }
+  
+  @keyframes ping {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    75% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+  
+  .flashsale__countdown-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .flashsale__countdown-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .flashsale__countdown {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .ega-badge-ctd {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .ega-badge-ctd__item {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff4d4f;
+    background-color: #fff;
+    border: 1px solid #ff4d4f;
+    border-radius: 4px;
+    padding: 5px 10px;
+    text-align: center;
+    min-width: 40px;
+  }
+  
+  .ega-badge-ctd__colon {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+  }
