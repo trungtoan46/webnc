@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Product } = require('../../../model');
+const { Product } = require('../../../models/index.model.js');
 
 // Get all products for admin
 router.get('/', async (req, res) => {

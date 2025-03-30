@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Label } from "@primer/react";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ const Register = () => {
   const [username, setUsername] = useState("");
 
   const onSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     setError("");
     if (password !== confirmPassword) {
       setError("Mật khẩu xác nhận không khớp!");
@@ -33,7 +34,10 @@ const Register = () => {
       <div className="bg-white p-8 rounded-xl shadow-md w-96">
         <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Đăng ký</h2>
 
-        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
+        {error && <Label variant="error" 
+        className="text-red-500 text-xl border-none text-center mb-6">
+          {error}
+        </Label>} 
 
         <form onSubmit={onSubmit} className="space-y-4">
           <input

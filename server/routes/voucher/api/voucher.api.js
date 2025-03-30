@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Voucher } = require('../../../model');
+const { Voucher } = require('../../../models/index.model');
 
 // Get all vouchers
 router.get('/', async (req, res) => {
@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     const vouchers = await Voucher.find();
     res.json(vouchers);
   } catch (error) {
-    console.error('Error fetching vouchers:', error);
+    console.error('Error fetching vouchers:', error); 
     res.status(500).json({ message: 'Server error' });
   }
 });
