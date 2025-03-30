@@ -3,11 +3,13 @@ import api from "./api"; // Sử dụng axios instance có sẵn
 // Đăng ký người dùng mới
 export const register = async (userData) => {
   try {
+    console.log('Sending registration data:', userData); // Log để debug
     const response = await api.post("/auth/register", userData);
+    console.log('Registration response:', response.data); // Log phản hồi từ server
     return response.data;
   } catch (error) {
     console.error("Error registering user:", error.response?.data || error.message);
-    throw error;
+    throw new Error(error.response?.data?.message || "Đăng ký thất bại! Vui lòng thử lại.");
   }
 };
 
@@ -44,6 +46,8 @@ export const getCurrentUser = async () => {
     throw error;
   }
 };
+
+
 
 // Kiểm tra xem người dùng có đang đăng nhập không
 export const isAuthenticated = () => {

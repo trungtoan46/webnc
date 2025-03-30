@@ -9,18 +9,22 @@ const Register = () => {
   const { handleRegister } = useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [username, setUsername] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     if (password !== confirmPassword) {
       setError("Mật khẩu xác nhận không khớp!");
       return;
     }
     try {
-      await handleRegister(email, password);
-      navigate("/dashboard");
+      await handleRegister({ email, password, username });
+      navigate("/login");
     } catch (error) {
-      setError("Đăng ký thất bại! Vui lòng thử lại." , error);
+      console.error("Lỗi đăng ký:", error);
+      // Hiển thị message lỗi từ server hoặc message mặc định
+      setError(error.response?.data?.message || error.message || "Đăng ký thất bại! Vui lòng thử lại.");
     }
   };
 
@@ -37,7 +41,15 @@ const Register = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full p-3 border text-gray-700 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
+          <input
+            type="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            className="w-full p-3 border text-gray-700 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
           <input
@@ -45,7 +57,7 @@ const Register = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Mật khẩu"
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full p-3 border text-gray-700 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
           <input
@@ -53,7 +65,7 @@ const Register = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Xác nhận mật khẩu"
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full p-3 border text-gray-700 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
           <button

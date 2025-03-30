@@ -1,81 +1,74 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const session = require('express-session');
+const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 var fs = require('fs');
 
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.json()); 
-//
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-const session = require('express-session');
-
+// Connect to database
 const connectDB = require('./database');
-connectDB();  
-const { Category, Product } = require('./model');
-const { create } = require('domain');
-const e = require('express');
-const { title } = require('process');
-const {crop} =require('./img/crop')
+connectDB();
 
-
-const cors = require('cors');
-
+// CORS configuration - Must be before other middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Hoặc domain frontend
-  credentials: true //Cho phép gửi cookie
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
 
+// Middleware
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json());
 
-
-// Session middleware should be defined before requiring routes
+// Session middleware
 app.use(session({
   secret: 'secret-key',
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 ngày
+  cookie: { 
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  }
 }));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Require routes after middleware is set up
-const cartRouter = require('./routers/cart');
-const adminRouter = require('./routers/admin');
-const adminCategoryRouter = require('./routers/admin-categories');
-const productsRouter = require('./routers/products');
-const adminProducts = require('./routers/admin-product');
-const apiRouter = require('./routers/api'); // New API router for React frontend
+// View engine setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// API routes for React frontend
-app.use('/api', apiRouter);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something broke!' });
+});
 
-// Traditional routes for server-rendered pages
-app.use('/products', productsRouter);
-app.use('/api/categories', adminCategoryRouter);
-app.use('/cart', cartRouter);
-app.use('/admin', adminRouter);
-app.use('/api/products', adminProducts);
+// Import and use routes
+const routes = require('./routes');
+app.use('/api', routes);
 
+// Default route
 app.get('/', (req, res) => {
-  res.redirect('/products');
+  res.redirect('/api/products');
 });
 
 // For React frontend in production
 if (process.env.NODE_ENV === 'production') {
-  // Serve static files from React build
   app.use(express.static(path.join(__dirname, '../client/dist')));
   
-  // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
   });
 }
 
-// Khởi động máy chủ
+// Start server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
