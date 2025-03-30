@@ -82,4 +82,4 @@ const FlashSale = () => {
   );
 };
 
-export default FlashSale;
+export default FlashSale; 

@@ -1,11 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT || 3000;
-var fs = require('fs');
 
 // Connect to database
 const connectDB = require('./database');
@@ -13,7 +12,7 @@ connectDB();
 
 // CORS configuration - Must be before other middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -27,7 +26,7 @@ app.use(express.json());
 
 // Session middleware
 app.use(session({
-  secret: 'secret-key',
+  secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: { 
@@ -69,6 +68,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

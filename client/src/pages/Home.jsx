@@ -5,6 +5,8 @@ import Banner from '../components/Banner';
 import Slide from '../components/Slide';
 import CustomerBenefits from '../components/customer-benefits';
 import ProductCollection from '../components/ProductCollection';
+import FlashSale from '../components/FlashSale';
+import CouponSection from '../components/CouponSection';
 
 const Home = () => {
   const categories = [
@@ -61,7 +63,9 @@ const Home = () => {
         <div className='w-full'>
             <Slide />
             <CustomerBenefits benefits={benefitsData} />
+            <FlashSale />
             <ProductCollection categories={categories} />
+            <CouponSection />
         </div>
     );
 };

@@ -69,4 +69,4 @@ const CouponSection = () => {
   );
 };
 
-export default CouponSection;
+export default CouponSection; 
