@@ -1,23 +1,28 @@
 import { useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { handleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
       await handleLogin(email, password);
-      navigate("/dashboard");
+      const redirectPath = location.state?.from && location.state.from !== "/login" 
+        ? location.state.from 
+        : "/";
+      navigate(redirectPath, { replace: true });
     } catch (error) {
-      setError("Đăng nhập thất bại! Vui lòng kiểm tra lại. ", error);
+      setError("Đăng nhập thất bại! Vui lòng kiểm tra lại. " + error);
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

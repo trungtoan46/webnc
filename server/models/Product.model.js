@@ -32,7 +32,16 @@ const ProductSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true,
-    }
+    },
+    quantity: {
+        type: Number,
+        default: 0,
+    },
+    is_active: {
+        type: Boolean,
+        default: true,
+    },
+    
 });
 ProductSchema.plugin(AutoIncrement, { inc_field: 'product_id' });
 

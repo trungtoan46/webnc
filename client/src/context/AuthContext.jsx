@@ -29,9 +29,12 @@ export const AuthProvider = ({ children }) => {
     try {
       await login(email, password);
       const userData = await getCurrentUser();
+      console.log("Logging in with:", email, password);
+      console.log("User data:", userData);
       setUser(userData);
     } catch (error) {
       console.error(error); 
+      throw error; 
     }
   };
 
