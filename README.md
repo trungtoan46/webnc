@@ -101,7 +101,7 @@ Tính năng bảng điều khiển quản trị:
 
 1. Sao chép kho lưu trữ
 ```bash
-git clone https://github.com/yourusername/webnc.git
+git clone https://github.com/trungtoan46/webnc.git
 cd webnc
 ```
 
