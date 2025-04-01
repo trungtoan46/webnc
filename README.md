@@ -1,30 +1,31 @@
-# WebNC - E-commerce Website
+# WebNC - Website Thương mại điện tử
 
-A full-stack e-commerce website built with Node.js, Express, MongoDB, and React.
+Website thương mại điện tử đầy đủ được xây dựng bằng Node.js, Express, MongoDB và React.
 
-## Features
+## Tính năng
 
 ### Frontend
-- Modern and responsive UI using Tailwind CSS
-- User authentication (Login/Register)
-- Product browsing and search
-- Shopping cart functionality
-- Flash sale countdown
-- Coupon system
-- Product categories
-- Customer benefits section
-- Image slider
+- Giao diện hiện đại và responsive sử dụng Tailwind CSS
+- Xác thực người dùng (Đăng nhập/Đăng ký)
+- Duyệt và tìm kiếm sản phẩm
+- Chức năng giỏ hàng
+- Đếm ngược flash sale
+- Hệ thống mã giảm giá
+- Danh mục sản phẩm
+- Phần lợi ích khách hàng
+- Slider hình ảnh
+- Bảng điều khiển quản trị với thống kê và hiển thị dữ liệu
 
 ### Backend
-- RESTful API architecture
-- JWT authentication
-- MongoDB database
-- File upload support
-- Session management
-- Error handling
-- CORS configuration
+- Kiến trúc API RESTful
+- Xác thực JWT
+- Cơ sở dữ liệu MongoDB
+- Hỗ trợ tải lên tệp
+- Quản lý phiên
+- Xử lý lỗi
+- Cấu hình CORS
 
-## Tech Stack
+## Công nghệ
 
 ### Frontend
 - React.js
@@ -44,118 +45,147 @@ A full-stack e-commerce website built with Node.js, Express, MongoDB, and React.
 - Cors
 - Express Session
 
-## Project Structure
+## Cấu trúc dự án
 
 ```
 webnc/
-├── client/                 # Frontend React application
-│   ├── public/            # Static files
+├── client/                 # Ứng dụng React Frontend
+│   ├── public/            # Tệp tĩnh
 │   └── src/
-│       ├── components/    # Reusable components
-│       ├── pages/         # Page components
-│       ├── services/      # API services
-│       ├── utils/         # Utility functions
-│       └── App.jsx        # Main App component
+│       ├── components/    # Các component tái sử dụng
+│       │   ├── admin/     # Component bảng điều khiển quản trị
+│       ├── layouts/       # Component bố cục
+│       ├── pages/         # Component trang
+│       ├── services/      # Dịch vụ API
+│       ├── utils/         # Hàm tiện ích
+│       └── App.jsx        # Component App chính
 │
-└── server/                # Backend Node.js application
-    ├── config/           # Configuration files
-    ├── controllers/      # Route controllers
-    ├── middleware/       # Custom middleware
-    ├── models/          # Database models
-    ├── routes/          # API routes
-    ├── services/        # Business logic
-    ├── uploads/         # Uploaded files
-    └── index.js         # Server entry point
+└── server/                # Ứng dụng Node.js Backend
+    ├── config/           # Tệp cấu hình
+    ├── controllers/      # Bộ điều khiển route
+    ├── middleware/       # Middleware tùy chỉnh
+    ├── models/          # Mô hình cơ sở dữ liệu
+    ├── routes/          # Route API
+    ├── services/        # Logic nghiệp vụ
+    ├── uploads/         # Tệp được tải lên
+    └── index.js         # Điểm vào máy chủ
 ```
 
-## Getting Started
+## Bảng điều khiển quản trị
 
-### Prerequisites
-- Node.js (v14 or higher)
+Bảng điều khiển quản trị cung cấp giao diện toàn diện để quản lý nền tảng thương mại điện tử:
+
+- Tổng quan bảng điều khiển với các chỉ số và thống kê quan trọng
+- Quản lý sản phẩm
+- Quản lý đơn hàng
+- Quản lý khách hàng
+- Quản lý danh mục
+- Phân tích và báo cáo bán hàng
+- Cài đặt và cấu hình
+
+Tính năng bảng điều khiển quản trị:
+- Biểu đồ tương tác để hiển thị dữ liệu
+- Theo dõi giao dịch gần đây
+- Theo dõi sản phẩm bán chạy
+- Giao diện thân thiện với người dùng với thanh bên tối
+- Thiết kế responsive cho tất cả các thiết bị
+
+## Bắt đầu
+
+### Yêu cầu hệ thống
+- Node.js (v14 trở lên)
 - MongoDB
-- npm or yarn
+- npm hoặc yarn
 
-### Installation
+### Cài đặt
 
-1. Clone the repository
+1. Sao chép kho lưu trữ
 ```bash
 git clone https://github.com/yourusername/webnc.git
 cd webnc
 ```
 
-2. Install dependencies
+2. Cài đặt các gói phụ thuộc
 ```bash
-# Install backend dependencies
+# Cài đặt các gói phụ thuộc backend
 cd server
 npm install
 
-# Install frontend dependencies
+# Cài đặt các gói phụ thuộc frontend
 cd ../client
 npm install
 ```
 
-3. Create .env file in server directory
+3. Tạo tệp .env trong thư mục server
 ```env
 PORT=3000
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
 ```
 
-4. Start the development servers
+4. Khởi động máy chủ phát triển
 ```bash
-# Start backend server
+# Khởi động máy chủ backend
 cd server
 npm run dev
 
-# Start frontend server
+# Khởi động máy chủ frontend
 cd client
 npm run dev
 ```
 
-The application will be available at:
+Ứng dụng sẽ có sẵn tại:
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3000
+- Bảng điều khiển quản trị: http://localhost:5173/admin (yêu cầu xác thực)
 
-## API Endpoints
+## Các điểm cuối API
 
-### Authentication
-- POST /api/auth/register - Register new user
-- POST /api/auth/login - Login user
-- POST /api/auth/logout - Logout user
+### Xác thực
+- POST /api/auth/register - Đăng ký người dùng mới
+- POST /api/auth/login - Đăng nhập người dùng
+- POST /api/auth/logout - Đăng xuất người dùng
+- GET /api/auth/me - Lấy thông tin người dùng hiện tại
 
-### Products
-- GET /api/products - Get all products
-- GET /api/products/:id - Get product by ID
-- POST /api/products - Create new product
-- PUT /api/products/:id - Update product
-- DELETE /api/products/:id - Delete product
+### Sản phẩm
+- GET /api/products - Lấy tất cả sản phẩm
+- GET /api/products/:id - Lấy sản phẩm theo ID
+- POST /api/products - Tạo sản phẩm mới
+- PUT /api/products/:id - Cập nhật sản phẩm
+- DELETE /api/products/:id - Xóa sản phẩm
 
-### Categories
-- GET /api/categories - Get all categories
-- POST /api/categories - Create new category
-- PUT /api/categories/:id - Update category
-- DELETE /api/categories/:id - Delete category
+### Danh mục
+- GET /api/categories - Lấy tất cả danh mục
+- POST /api/categories - Tạo danh mục mới
+- PUT /api/categories/:id - Cập nhật danh mục
+- DELETE /api/categories/:id - Xóa danh mục
 
-### Cart
-- GET /api/cart - Get user's cart
-- POST /api/cart - Add item to cart
-- PUT /api/cart/:id - Update cart item
-- DELETE /api/cart/:id - Remove item from cart
+### Giỏ hàng
+- GET /api/cart - Lấy giỏ hàng của người dùng
+- POST /api/cart - Thêm mặt hàng vào giỏ hàng
+- PUT /api/cart/:id - Cập nhật mặt hàng trong giỏ hàng
+- DELETE /api/cart/:id - Xóa mặt hàng khỏi giỏ hàng
 
-### Vouchers
-- GET /api/vouchers - Get all vouchers
-- POST /api/vouchers - Create new voucher
-- PUT /api/vouchers/:id - Update voucher
-- DELETE /api/vouchers/:id - Delete voucher
+### Mã giảm giá
+- GET /api/vouchers - Lấy tất cả mã giảm giá
+- POST /api/vouchers - Tạo mã giảm giá mới
+- PUT /api/vouchers/:id - Cập nhật mã giảm giá
+- DELETE /api/vouchers/:id - Xóa mã giảm giá
 
-## Contributing
+### Quản trị
+- GET /api/admin/stats - Lấy thống kê bảng điều khiển
+- GET /api/admin/orders - Lấy dữ liệu đơn hàng
+- GET /api/admin/products/top - Lấy sản phẩm bán chạy
+- GET /api/admin/customers - Lấy dữ liệu khách hàng
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Đóng góp
 
-## License
+1. Fork kho lưu trữ
+2. Tạo nhánh tính năng của bạn (`git checkout -b feature/TinhNangTuyetVoi`)
+3. Commit thay đổi của bạn (`git commit -m 'Thêm TinhNangTuyetVoi'`)
+4. Push lên nhánh (`git push origin feature/TinhNangTuyetVoi`)
+5. Mở Pull Request
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+## Giấy phép
+
+Dự án này được cấp phép theo Giấy phép MIT - xem tệp LICENSE để biết chi tiết. 
