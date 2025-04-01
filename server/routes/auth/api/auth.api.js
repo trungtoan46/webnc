@@ -8,7 +8,7 @@ const { User } = require('../../../models/index.model');
 router.post('/register', async (req, res) => {
   try {
     const { email, password, username } = req.body;
-
+    console.log('Received registration data:', { email, password, username }); // Log để debug
     // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email và mật khẩu là bắt buộc' });
@@ -59,7 +59,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    console.log('Received login data from server:', { email, password }); // Log để debug
     // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email và mật khẩu là bắt buộc' });

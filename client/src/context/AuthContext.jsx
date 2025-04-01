@@ -1,18 +1,29 @@
 import { createContext, useState, useEffect } from "react";
 import { login, logout, getCurrentUser, isAuthenticated, register } from "../services/api/authService";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();   
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      getCurrentUser().then(setUser).catch(() => logout());
-    }
-  }, []);
+    const initAuth = async () => {
+      try {
+        if (isAuthenticated()) {
+          const userData = await getCurrentUser();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    initAuth();
+  }, []);
 
   // Đăng ký tài khoản
   const handleRegister = async (userData) => {
@@ -21,20 +32,20 @@ export const AuthProvider = ({ children }) => {
       return response;
     } catch (error) {
       console.error('Registration error:', error);
-      throw error; // Throw the error để component có thể bắt và hiển thị
+      throw error;
     }
   };
-    // Đăng nhập
+
+  // Đăng nhập
   const handleLogin = async (email, password) => {
     try {
-      await login(email, password);
+      const response = await login(email, password);
       const userData = await getCurrentUser();
-      console.log("Logging in with:", email, password);
-      console.log("User data:", userData);
       setUser(userData);
+      return response;
     } catch (error) {
-      console.error(error); 
-      throw error; 
+      console.error('Login error:', error);
+      throw error;
     }
   };
 
@@ -43,6 +54,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <AuthContext.Provider value={{ user, handleLogin, handleLogout, handleRegister }}>
       {children}
@@ -50,4 +65,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthContext;
+export default AuthProvider;
+

@@ -1,8 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import {ThemeProvider, BaseStyles} from '@primer/react'
 //Components
-import Header from './components/Header'
-import Footer from './components/Footer'
 import Home from './pages/Home'
 import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/Cart'
@@ -10,47 +8,69 @@ import './App.css'
 import './index.css'
 import Admin from './pages/Admin'
 import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider } from "./context/AuthContext";
+import AuthProvider  from "./context/AuthContext";
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import MainLayout from './layouts/MainLayout'
 
 function App() {
   return (
-  <ThemeProvider>
-    <BaseStyles>
-      <AuthProvider>
-        <Router>
-          <div className="flex flex-col min-h-screen w-full">
-            <Header />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Home />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route 
-                    path="/admin" 
-                    element={
-                      <ProtectedRoute>
-                        <Admin />
-                      </ProtectedRoute>
-                    } 
-                  />
-                <Route path="/login" element={<Login />} />
-                <Route path='/register' element={<Register />} />
-                <Route path='/dashboard' element={<Dashboard />} /> 
-                
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </Router>
-      </AuthProvider>
+    <ThemeProvider>
+      <BaseStyles>
+        <AuthProvider>
+          <Router>
+            <Routes>
+              {/* Routes with Header and Footer */}
+              <Route path="/" element={
+                <MainLayout>
+                  <Home />
+                </MainLayout>
+              } />
+              <Route path="/products" element={
+                <MainLayout>
+                  <Home />
+                </MainLayout>
+              } />
+              <Route path="/products/:id" element={
+                <MainLayout>
+                  <ProductDetail />
+                </MainLayout>
+              } />
+              <Route path="/cart" element={
+                <MainLayout>
+                  <Cart />
+                </MainLayout>
+              } />
+              <Route path="/admin" element={
+                <MainLayout showHeader={false} showFooter={false}>
+                  <ProtectedRoute>
+                    <Admin />
+                  </ProtectedRoute>
+                </MainLayout>
+              } />
+              <Route path="/dashboard" element={
+                <MainLayout>
+                  <Dashboard />
+                </MainLayout>
+              } />
+
+              {/* Routes without Header and Footer */}
+              <Route path="/login" element={
+                <MainLayout showHeader={false} showFooter={false}>
+                  <Login />
+                </MainLayout>
+              } />
+              <Route path="/register" element={
+                <MainLayout showHeader={false} showFooter={false}>
+                  <Register />
+                </MainLayout>
+              } />
+            </Routes>
+          </Router>
+        </AuthProvider>
       </BaseStyles>
     </ThemeProvider>
-
-
   );
 }
 

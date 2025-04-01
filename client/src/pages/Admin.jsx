@@ -1,86 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api/api';
+import Sidebar from '../components/admin/Sidebar';
+import Header from '../components/admin/Header';
+import Dashboard from '../components/admin/Dashboard';
 
 const Admin = () => {
-    const [categories, setCategories] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [vouchers, setVouchers] = useState([]);
-    const navigate = useNavigate();
-    return (
-        <div className='p-4' >
-            <h1 className='text-2xl font-bold mb-4 text-gray-800'>Admin</h1>
-            <div className='flex justify-between items-center mb-4'>
-                <h2 className='text-xl font-bold text-gray-800'>Products</h2>
-                <button className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors'
-                onClick={() => navigate('/admin/products/create')}
-                >
-                    Add Product
-                </button>
-            </div>
-            <table className='w-full border-collapse border border-gray-300 rounded-lg shadow-md overflow-hidden'>
-            <thead>
-                <tr className='bg-gray-100 text-gray-700'>
-                    <th className='border border-gray-300 p-2'>Name</th>
-                    <th className='border border-gray-300 p-2'>Price</th>
-                    <th className='border border-gray-300 p-2'>Description</th>
-                    <th className='border border-gray-300 p-2'>Category</th>
-                    <th className='border border-gray-300 p-2'>Image</th>
-                    <th className='border border-gray-300 p-2'>Created At</th>
-                    <th className='border border-gray-300 p-2'>Action</th>
-                </tr>   
-            </thead>
-            <tbody>
-                {products.map((product) => (
-                    <tr key={product.id}>
-                        <td className='border border-gray-300 p-2'>{product.name}</td>
-                        <td className='border border-gray-300 p-2'>{product.price}</td>
-                        <td className='border border-gray-300 p-2'>{product.description}</td>
-                        <td className='border border-gray-300 p-2'>{product.category}</td>
-                        <td className='border border-gray-300 p-2'>{product.image_url}</td>
-                        <td className='border border-gray-300 p-2'>{product.createdAt}</td>
-                        <td className='border border-gray-300 p-2'>
-                            <Link to={`/admin/products/${product.id}`} className='text-blue-500 hover:text-blue-700'>Edit</Link>
-                            <button className='text-red-500 hover:text-red-700'>Delete</button>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-         </table>
+    // Khai báo các state cần thiết
+    const [stats] = useState({
+        totalSales: '$10,546',
+        totalOrders: '1,056',
+        uniqueVisits: '5,420',
+        newUsers: '1,650',
+        pageViews: '9,653'
+    });
+    
+    const [recentTransactions] = useState([
+        { id: 1, name: 'Jagarmath S.', date: '24.05.2023', amount: '$124.97', status: 'Paid' },
+        { id: 2, name: 'Anand G.', date: '23.05.2023', amount: '$55.42', status: 'Pending' },
+        { id: 3, name: 'Kartik S.', date: '23.05.2023', amount: '$89.90', status: 'Paid' },
+        { id: 4, name: 'Rakesh S.', date: '22.05.2023', amount: '$144.84', status: 'Pending' },
+        { id: 5, name: 'Anup S.', date: '22.05.2023', amount: '$70.52', status: 'Paid' }
+    ]);
+    
+    const [topProducts] = useState([
+        { id: 1, name: 'Men Grey Hoodie', price: '$49.90', unitsSold: 204, image: '/images/grey-hoodie.jpg' },
+        { id: 2, name: 'Women Striped T-Shirt', price: '$34.90', unitsSold: 155, image: '/images/striped-tshirt.jpg' },
+        { id: 3, name: 'White T-Shirt', price: '$40.90', unitsSold: 120, image: '/images/white-tshirt.jpg' },
+        { id: 4, name: 'Men White T-Shirt', price: '$49.90', unitsSold: 204, image: '/images/men-white-tshirt.jpg' },
+        { id: 5, name: 'Women Red T-Shirt', price: '$34.90', unitsSold: 155, image: '/images/red-tshirt.jpg' }
+    ]);
+    
+    const [sidebarActive, setSidebarActive] = useState('dashboard');
+    const [currentView, setCurrentView] = useState('dashboard');
 
-        <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/4 p-4 bg-white shadow-md hidden'>
-                <form action="">
-                    <div className='mb-4'>
-                        <label htmlFor="name" className='block text-gray-700 font-bold mb-2'>Name</label>
-                        <input type="text" id="name" name="name" className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' />
-                    </div>
-                    <div className='mb-4'>
-                        <label htmlFor="price" className='block text-gray-700 font-bold mb-2'>Price</label>
-                        <input type="number" id="price" name="price" className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' />
-                    </div>  
-                    <div className='mb-4'>  
-                        <label htmlFor="description" className='block text-gray-700 font-bold mb-2'>Description</label> 
-                        <textarea id="description" name="description" className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' />
-                    </div>
-                    <div className='mb-4'>
-                        <label htmlFor="category" className='block text-gray-700 font-bold mb-2'>Category</label>
-                        <input type="text" id="category" name="category" className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' />
-                    </div>
-                    <div className='mb-4'>
-                        <label htmlFor="image_url" className='block text-gray-700 font-bold mb-2'>Image URL</label>
-                        <input type="text" id="image_url" name="image_url" className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' />
-                    </div>
-                    <button type="submit" className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors'>Add Product</button>
-                    
-                    
-                </form>
-        </div>
-
-        </div>
-
+    // Fetch data từ API khi component mount
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Ở đây sẽ fetch data thực tế từ API
+                // Ví dụ: const response = await api.get('/dashboard/stats');
+                // setStats(response.data);
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        };
         
+        fetchData();
+    }, []);
+
+    // Render active view content 
+    const renderContent = () => {
+        switch (currentView) {
+            case 'dashboard':
+                return (
+                    <Dashboard 
+                        stats={stats}
+                        recentTransactions={recentTransactions}
+                        topProducts={topProducts}
+                    />
+                );
+            // Add other views here
+            default:
+                return (
+                    <div className="p-6 w-full">
+                        <h2 className="text-xl font-semibold text-blue-600">
+                            {sidebarActive.charAt(0).toUpperCase() + sidebarActive.slice(1)}
+                        </h2>
+                        <p className="text-gray-600 mt-2">This section is under development.</p>
+                    </div>
+                );
+        }
+    };
+
+    // Sidebar click handler
+    const handleSidebarClick = (view) => {
+        setSidebarActive(view);
+        setCurrentView(view);
+    };
+
+    return (
+        <div className="flex h-screen w-full bg-gray-100">
+            <Sidebar 
+                sidebarActive={sidebarActive} 
+                setSidebarActive={handleSidebarClick} 
+            />
+            
+            <div className="flex-1 overflow-auto bg-gray-50 w-full">
+                <Header />
+                {renderContent()}
+            </div>
+        </div>
     );
 };
 
-export default Admin;
+export default Admin; 

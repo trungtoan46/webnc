@@ -16,6 +16,7 @@ export const register = async (userData) => {
 // Đăng nhập và lưu token
 export const login = async (email, password) => {
   try {
+    console.log('Sending login data:', { email, password }); // Log để debug
     const response = await api.post("/auth/login", { email, password });
 
     if (response.data.token) {

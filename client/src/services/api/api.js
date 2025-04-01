@@ -1,12 +1,18 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Khởi tạo token từ localStorage nếu có
+const token = localStorage.getItem("token");
+if (token) {
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
 
 // Interceptors for request
 api.interceptors.request.use(
@@ -28,8 +34,12 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle errors globally
-    console.error('API Error:', error);
+    if (error.response?.status === 401) {
+      // Token hết hạn hoặc không hợp lệ
+      localStorage.removeItem("token");
+      delete api.defaults.headers.common["Authorization"];
+      window.location.href = "/login";
+    }
     return Promise.reject(error);
   }
 );
