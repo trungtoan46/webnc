@@ -20,8 +20,15 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # misc
 .DS_Store
 .vscode/
 .idea/
+
+# Remove .env from gitignore to allow pushing environment files
+# .env
+# .env.*
+# !.env.example
