@@ -3,6 +3,8 @@ import Sidebar from '../components/admin/Sidebar';
 import Header from '../components/admin/Header';
 import Dashboard from '../components/admin/Dashboard';
 import Products from './admin/Products';
+import Categories from './admin/Categories';
+import { FiMenu } from 'react-icons/fi';
 
 const Admin = () => {
     // Khai báo các state cần thiết
@@ -32,6 +34,12 @@ const Admin = () => {
     
     const [sidebarActive, setSidebarActive] = useState('dashboard');
     const [currentView, setCurrentView] = useState('dashboard');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+    // Toggle sidebar for mobile
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
 
     // Fetch data từ API khi component mount
     useEffect(() => {
@@ -48,6 +56,22 @@ const Admin = () => {
         fetchData();
     }, []);
 
+    // Close sidebar on mobile when changing views
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setIsSidebarOpen(false);
+            } else {
+                setIsSidebarOpen(true);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // Render active view content 
     const renderContent = () => {
         switch (currentView) {
@@ -61,7 +85,8 @@ const Admin = () => {
                 );
             case 'products':
                 return <Products />;
-            // Add other views here
+            case 'categories':
+                return <Categories />;
             default:
                 return (
                     <div className="p-6 w-full">
@@ -78,18 +103,47 @@ const Admin = () => {
     const handleSidebarClick = (view) => {
         setSidebarActive(view);
         setCurrentView(view);
+        if (window.innerWidth <= 768) {
+            setIsSidebarOpen(false);
+        }
     };
 
     return (
-        <div className="flex h-screen w-full bg-gray-100">
-            <Sidebar 
-                sidebarActive={sidebarActive} 
-                setSidebarActive={handleSidebarClick} 
-            />
+        <div className="flex h-screen w-full bg-gray-100 relative">
+            {/* Mobile menu button */}
+            <button 
+                onClick={toggleSidebar}
+                className="md:hidden fixed top-4 left-4 z-50 bg-blue-900 text-white p-2 rounded-md"
+            >
+                <FiMenu size={24} />
+            </button>
+
+            {/* Overlay for mobile */}
+            {isSidebarOpen && (
+                <div 
+                    className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <div className={`
+                fixed md:static inset-y-0 left-0 z-50
+                transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                transition-transform duration-300 ease-in-out md:translate-x-0
+            `}>
+                <Sidebar 
+                    sidebarActive={sidebarActive} 
+                    setSidebarActive={handleSidebarClick} 
+                />
+            </div>
             
+            {/* Main content */}
             <div className="flex-1 overflow-auto bg-gray-50 w-full">
-                <Header />
-                {renderContent()}
+                <div className="pl-0 md:pl-64">
+                    <Header />
+                    {renderContent()}
+                </div>
             </div>
         </div>
     );

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
-import { FormControl, FormLabel, FormInput } from '@primer/react-brand';
+import {FormControl, TextInput} from '@primer/react'
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
-  
+  const [category, setCategory] = useState('');
   // Dữ liệu mẫu
   const products = [
     {
@@ -33,6 +33,14 @@ const Products = () => {
       status: 'Hết hàng'
     }
   ];
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      setCategory(data);
+    };
+  }, []);
 
   return (
     <div className="p-6">
@@ -138,14 +146,23 @@ const Products = () => {
       </div>
 
       {showModal && (
+      <FormControl>
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-lg font-semibold mb-4">Thêm sản phẩm mới</h3>
-            <form>
-              <label>Tên sản phẩm</label>
-              <input type="text" />
-            </form>   
-            <div className="mt-4 flex justify-end">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Thêm sản phẩm mới</h3>
+              <label className='mb-2 text-gray-700'>Tên sản phẩm</label>
+              <TextInput />
+              <label className='mb-2 text-gray-700'>Danh mục</label>
+              <option value={products.category}></option>
+              <label className='mb-2 text-gray-700'>Giá</label>
+              <TextInput />
+              <label className='mb-2 text-gray-700'>Tồn kho</label>
+              <TextInput />
+              <label className='mb-2 text-gray-700'>Trạng thái</label>
+              <TextInput />
+
+         
+              <div className="mt-4 flex justify-end">
               <button 
                 className="px-4 py-2 bg-gray-200 rounded-md mr-2"
                 onClick={() => setShowModal(false)}
@@ -156,8 +173,11 @@ const Products = () => {
                 Lưu
               </button>
             </div>
+            
           </div>
         </div>
+        </FormControl>
+
       )}
     </div>
   );

@@ -17,6 +17,7 @@
     "@primer/react-brand": "^0.49.0",
     "@tailwindcss/postcss7-compat": "^2.2.17",
     "@thatapicompany/thecatapi": "^1.0.2",
+    "all": "^0.0.0",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

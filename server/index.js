@@ -12,8 +12,12 @@ connectDB();
 
 // CORS configuration - Must be before other middleware
 app.use(cors({
-  origin: ['http://localhost:3001', 'http://localhost:5173'],
-  credentials: true
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['http://localhost:3001', 'http://localhost:5173']
+    : true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 // Middleware

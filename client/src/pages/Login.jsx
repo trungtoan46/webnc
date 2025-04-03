@@ -2,7 +2,6 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 import { useNavigate } from "react-router-dom";
-import { InlineMessage } from '@primer/react-brand';
 import AuthLayout from "../layouts/AuthLayout";
 
 const Login = () => {
@@ -16,11 +15,11 @@ const Login = () => {
     e.preventDefault();
     setError("");
     try {
-      await handleLogin( email, password );
+      await handleLogin(email, password);
       navigate("/");
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      setError(error.response?.data?.message || error.message || "Đăng nhập thất bại! Vui lòng thử lại.");
+      setError(error.message || "Đăng nhập thất bại! Vui lòng thử lại.");
     }
   };
 
@@ -30,7 +29,11 @@ const Login = () => {
         <div className="bg-white p-8 rounded-xl shadow-md w-96">
           <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Đăng nhập</h2>
 
-          {error && <InlineMessage variant="error">{error}</InlineMessage>}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
 
           <form onSubmit={onSubmit} className="space-y-4">
             <input

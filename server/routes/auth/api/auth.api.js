@@ -59,31 +59,36 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Received login data from server:', { email, password }); // Log để debug
+    console.log('Received login request:', { email }); // Log email only, not password
+
     // Validate input
     if (!email || !password) {
+      console.log('Missing email or password');
       return res.status(400).json({ message: 'Email và mật khẩu là bắt buộc' });
     }
 
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('User not found:', email);
       return res.status(400).json({ message: 'Email hoặc mật khẩu không chính xác' });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log('Password mismatch for user:', email);
       return res.status(400).json({ message: 'Email hoặc mật khẩu không chính xác' });
     }
 
     // Generate token
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
+    console.log('Login successful for user:', email);
     res.json({
       message: 'Đăng nhập thành công',
       token,

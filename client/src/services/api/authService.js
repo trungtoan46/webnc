@@ -16,18 +16,35 @@ export const register = async (userData) => {
 // Đăng nhập và lưu token
 export const login = async (email, password) => {
   try {
-    console.log('Sending login data:', { email, password }); // Log để debug
+    console.log('Sending login data:', { email }); // Log email only, not password
     const response = await api.post("/auth/login", { email, password });
 
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      api.defaults.headers["Authorization"] = `Bearer ${response.data.token}`;
+    // Kiểm tra response status
+    if (response.status >= 400) {
+      throw new Error(response.data.message || "Email hoặc mật khẩu không chính xác");
     }
 
-    return response.data;
+    // Kiểm tra và lưu token
+    if (response.data && response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      api.defaults.headers["Authorization"] = `Bearer ${response.data.token}`;
+      return response.data;
+    } else {
+      throw new Error("Token không hợp lệ từ server");
+    }
+
   } catch (error) {
-    console.error("Error logging in:", error.response?.data || error.message);
-    throw error;
+    console.error("Error logging in:", error);
+    if (error.response) {
+      // Lỗi từ server
+      throw new Error(error.response.data?.message || "Email hoặc mật khẩu không chính xác");
+    } else if (error.request) {
+      // Lỗi không nhận được response
+      throw new Error("Không thể kết nối đến server");
+    } else {
+      // Lỗi khác
+      throw new Error(error.message || "Đã xảy ra lỗi khi đăng nhập");
+    }
   }
 };
 

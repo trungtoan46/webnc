@@ -45,7 +45,12 @@ const AuthProvider = ({ children }) => {
       return response;
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      // Đảm bảo luôn throw Error object với message rõ ràng
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error(typeof error === 'string' ? error : 'Đăng nhập thất bại! Vui lòng thử lại.');
+      }
     }
   };
 
