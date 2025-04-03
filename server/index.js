@@ -12,11 +12,8 @@ connectDB();
 
 // CORS configuration - Must be before other middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
+  origin: ['http://localhost:3001', 'http://localhost:5173'],
+  credentials: true
 }));
 
 // Middleware
@@ -70,5 +67,5 @@ if (process.env.NODE_ENV === 'production') {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

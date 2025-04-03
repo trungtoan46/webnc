@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/admin/Sidebar';
 import Header from '../components/admin/Header';
 import Dashboard from '../components/admin/Dashboard';
-import Products from '../components/admin/Products';
+import Products from './admin/Products';
 
 const Admin = () => {
     // Khai báo các state cần thiết

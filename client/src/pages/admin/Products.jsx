@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
+import { FormControl, FormLabel, FormInput } from '@primer/react-brand';
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showModal, setShowModal] = useState(false);
   
   // Dữ liệu mẫu
   const products = [
@@ -36,7 +38,10 @@ const Products = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Quản lý sản phẩm</h2>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center">
+        <button 
+          className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center"
+          onClick={() => setShowModal(true)}
+        >
           <FiPlus className="mr-2" />
           Thêm sản phẩm
         </button>
@@ -131,6 +136,29 @@ const Products = () => {
           </table>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h3 className="text-lg font-semibold mb-4">Thêm sản phẩm mới</h3>
+            <form>
+              <label>Tên sản phẩm</label>
+              <input type="text" />
+            </form>   
+            <div className="mt-4 flex justify-end">
+              <button 
+                className="px-4 py-2 bg-gray-200 rounded-md mr-2"
+                onClick={() => setShowModal(false)}
+              >
+                Hủy
+              </button>
+              <button className="px-4 py-2 bg-blue-500 text-white rounded-md">
+                Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
