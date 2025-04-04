@@ -102,7 +102,13 @@ const getCart = async () => {
 // Tạo sản phẩm mới (cho admin)
 const createProduct = async (productData) => {
   try {
-    const response = await api.post('/products', productData);
+    const response =
+    await api.post('/products', productData, 
+      {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error creating product:', error);
