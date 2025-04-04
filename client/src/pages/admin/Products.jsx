@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
 import {FormControl, TextInput} from '@primer/react'
+import AddProduct from './AddProduct';
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [category, setCategory] = useState('');
-  // Dữ liệu mẫu
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  // Dữ liệu mẫu  
   const products = [
     {
       id: 1,
@@ -34,13 +35,9 @@ const Products = () => {
     }
   ];
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const response = await fetch('/api/categories');
-      const data = await response.json();
-      setCategory(data);
-    };
-  }, []);
+  if (showAddForm) {
+    return <AddProduct onCancel={() => setShowAddForm(false)} />;
+  }
 
   return (
     <div className="p-6">
@@ -48,7 +45,7 @@ const Products = () => {
         <h2 className="text-xl font-semibold text-gray-800">Quản lý sản phẩm</h2>
         <button 
           className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center"
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowAddForm(true)}
         >
           <FiPlus className="mr-2" />
           Thêm sản phẩm
@@ -144,41 +141,6 @@ const Products = () => {
           </table>
         </div>
       </div>
-
-      {showModal && (
-      <FormControl>
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">Thêm sản phẩm mới</h3>
-              <label className='mb-2 text-gray-700'>Tên sản phẩm</label>
-              <TextInput />
-              <label className='mb-2 text-gray-700'>Danh mục</label>
-              <option value={products.category}></option>
-              <label className='mb-2 text-gray-700'>Giá</label>
-              <TextInput />
-              <label className='mb-2 text-gray-700'>Tồn kho</label>
-              <TextInput />
-              <label className='mb-2 text-gray-700'>Trạng thái</label>
-              <TextInput />
-
-         
-              <div className="mt-4 flex justify-end">
-              <button 
-                className="px-4 py-2 bg-gray-200 rounded-md mr-2"
-                onClick={() => setShowModal(false)}
-              >
-                Hủy
-              </button>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-md">
-                Lưu
-              </button>
-            </div>
-            
-          </div>
-        </div>
-        </FormControl>
-
-      )}
     </div>
   );
 };

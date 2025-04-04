@@ -84,7 +84,7 @@ const Admin = () => {
                     />
                 );
             case 'products':
-                return <Products />;
+                return <Products />; 
             case 'categories':
                 return <Categories />;
             default:
@@ -140,7 +140,7 @@ const Admin = () => {
             
             {/* Main content */}
             <div className="flex-1 overflow-auto bg-gray-50 w-full">
-                <div className="pl-0 md:pl-64">
+                <div className="pl-0 md:pl-4 md:pr-4">
                     <Header />
                     {renderContent()}
                 </div>

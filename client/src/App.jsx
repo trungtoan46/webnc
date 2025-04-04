@@ -13,7 +13,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import MainLayout from './layouts/MainLayout'
-
+import AddProduct from './pages/admin/AddProduct'
 function App() {
   return (
     <ThemeProvider>
@@ -49,6 +49,13 @@ function App() {
                   </ProtectedRoute>
                 </MainLayout>
               } />
+
+              <Route path="/admin/products/add" element={
+                <MainLayout showHeader={false} showFooter={false}>
+                  <AddProduct />
+                </MainLayout>
+              } />
+
               <Route path="/dashboard" element={
                 <MainLayout>
                   <Dashboard />
