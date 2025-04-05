@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { FormControl, TextInput, Select, Textarea } from '@primer/react';
 import { FiUpload } from 'react-icons/fi';
 import { addProduct } from '../../services/api/admin';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import api from '../../services/api/api';
+import { useEffect } from 'react';
 
 const AddProduct = ({ onCancel }) => {
   const [formData, setFormData] = useState({
@@ -20,8 +23,15 @@ const AddProduct = ({ onCancel }) => {
 
   const [sizes, setSizes] = useState([]);
   const [colors, setColors] = useState([]);
-  const [price, setPrice] = useState(0);
+  const [categories, setCategories] = useState([]);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await api.get('/categories');
+      setCategories(response.data);
+    };
+    fetchCategories();  
+  }, []);
   const handlePriceChange = (price) => {
     const priceInput = document.getElementById('price-input');
     if (priceInput.value == price) {
@@ -33,21 +43,82 @@ const AddProduct = ({ onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Kiểm tra các trường bắt buộc
+    const requiredFields = {
+      name: 'Tên sản phẩm',
+      description: 'Mô tả sản phẩm',
+      price: 'Giá sản phẩm',
+      category: 'Danh mục'
+    };
+
+    const emptyFields = [];
+    for (const [field, label] of Object.entries(requiredFields)) {
+      if (!formData[field]) {
+        emptyFields.push(label);
+      }
+    }
+
+    if (emptyFields.length > 0) {
+      toast.error(`Vui lòng nhập: ${emptyFields.join(', ')}`);
+      return;
+    }
+
+    if (formData.images.length === 0) {
+      toast.error('Vui lòng thêm ít nhất một hình ảnh sản phẩm');
+      return;
+    }
+
+    if (sizes.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một kích cỡ');
+      return;
+    }
+
+    if (colors.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một màu sắc');
+      return;
+    }
+
+    if (formData.tags.length === 0) {
+      toast.error('Vui lòng thêm ít nhất một thẻ cho sản phẩm');
+      return;
+    }
+
     try {
       // Chuẩn bị dữ liệu sản phẩm
-      const productData = {
+      const productData = new FormData();
+      productData.append('name', formData.name);
+      productData.append('description', formData.description);
+      productData.append('price', formData.price);
+      productData.append('category_id', formData.category);
+      productData.append('size', sizes.join(','));
+      productData.append('color', colors.join(','));
+      productData.append('quantity', formData.quantity || 0);
+      productData.append('is_active', true);
+      productData.append('tags', JSON.stringify(formData.tags));
+
+      // Thêm từng ảnh vào FormData
+      formData.images.forEach((image) => {
+        productData.append(`images`, image);
+      });
+
+      // Log để kiểm tra dữ liệu trước khi gửi
+      console.log('Dữ liệu sản phẩm:', {
         name: formData.name,
         description: formData.description,
         price: formData.price,
         category_id: formData.category,
         size: sizes.join(','),
         color: colors.join(','),
-        quantity: formData.quantity || 0, // Mặc định số lượng ban đầu là 0
-        is_active: true
-      };
+        quantity: formData.quantity || 0,
+        is_active: true,
+        tags: formData.tags,
+        images: formData.images.map(img => img.name)
+      });
 
       // Gọi API thêm sản phẩm
-      await addProduct(productData);
+      const response = await addProduct(productData);
+      console.log('Phản hồi từ server:', response);
       
       // Hiển thị thông báo thành công
       toast.success('Thêm sản phẩm thành công!');
@@ -64,7 +135,8 @@ const AddProduct = ({ onCancel }) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
+      tags: name === 'tags' ? value.split(',') : prev.tags
     }));
   };
 
@@ -110,13 +182,36 @@ const AddProduct = ({ onCancel }) => {
   };
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
+    try {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
 
-    setFormData(prev => ({
-      ...prev,
-      images: [...prev.images, ...files]
-    }));
+      // Kiểm tra loại file
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      const invalidFiles = files.filter(file => !validTypes.includes(file.type));
+      
+      if (invalidFiles.length > 0) {
+        toast.error('Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG');
+        return;
+      }
+
+      // Kiểm tra kích thước file (tối đa 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const oversizedFiles = files.filter(file => file.size > maxSize);
+      
+      if (oversizedFiles.length > 0) {
+        toast.error('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...files]
+      }));
+    } catch (error) {
+      console.error('Lỗi khi tải file:', error);
+      toast.error('Có lỗi xảy ra khi tải file. Vui lòng thử lại!');
+    }
   };
 
   const handleImageDelete = (index) => {
@@ -144,6 +239,17 @@ const AddProduct = ({ onCancel }) => {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -335,14 +441,19 @@ const AddProduct = ({ onCancel }) => {
                   <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">Danh Mục</h3>
                   <div className="space-y-2 flex flex-col items-center justify-start">
                     <div className='w-full text-left'>
-                    <select name="category" id="category" 
-                    className="text-gray-900 border-2
-                     border-gray-300 rounded-md mb-4 w-full lg:w-1/3 md:w-full">
-                      <option value="">Chọn Danh Mục</option>
-                      <option value="women">Nữ</option>
-                      <option value="men">Nam</option>
-                      <option value="tshirt">Áo Thun</option>
-                      <option value="hoodie">Áo Hoodie</option>
+                    <select 
+                      name="category" 
+                      id="category" 
+                      value={formData.category} 
+                      onChange={handleChange}
+                      className="text-gray-900 border-2 border-gray-300 rounded-md mb-4 w-full lg:w-1/3 md:w-full"
+                    >
+                      <option value="" disabled>Chọn danh mục</option>
+                      {categories.map(category => (
+                        <option key={category._id} value={category._id}>
+                          {category.name}
+                        </option>
+                      ))}
                     </select>
                     </div>
                     <button className="text-blue-600 hover:text-blue-800
@@ -350,7 +461,12 @@ const AddProduct = ({ onCancel }) => {
                   </div>
                 </section>
 
-                <section>
+                <section
+                  name="tags"
+                  value={formData.tags }
+                  onChange={handleChange}
+
+                >
                   <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">Thẻ</h3>
                   <div className="space-y-2">
                     <div className="flex flex-wrap gap-2 justify-center">
@@ -382,9 +498,12 @@ const AddProduct = ({ onCancel }) => {
                        border-gray-300 rounded-md mb-4 p-2"
                     />
                     <div className="flex flex-wrap gap-2 mt-2 justify-center">
-                      <span className="px-2 py-1 bg-gray-100 rounded-full text-sm text-blue-600">Áo Thun</span>
-                      <span className="px-2 py-1 bg-gray-100 rounded-full text-sm text-blue-600">Quần Áo Nam</span>
-                      <span className="px-2 py-1 bg-gray-100 rounded-full text-sm text-blue-600">Bộ Sưu Tập Mùa Hè</span>
+                        <span  className="px-2 py-1 bg-gray-100 rounded-full text-sm text-blue-600">
+                          
+                          
+                          
+                        </span>
+                      
                     </div>
                   </div>
                 </section>

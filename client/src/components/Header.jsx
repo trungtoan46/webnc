@@ -7,7 +7,8 @@ const Header = ({ theme = 'light' }) => {
  
 
   return (
-    <header className={`rounded-lg ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
+    <header className={`rounded-lg ${theme === 'dark' ? 
+    'bg-gray-800 text-white' : 'bg-white text-black'}`}>
       <Nav /> {/* Use the Nav component */}
       <Banner img={bannerImage} />
     </header>

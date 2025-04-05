@@ -2,6 +2,7 @@ import api from './api';
 
 export const addProduct = async (product) => {
     const response = await api.post('/admin/products', product);
+    console.log(response);
     return response.data;
 };
 

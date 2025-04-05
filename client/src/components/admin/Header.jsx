@@ -1,6 +1,9 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import Search from './Search';
+import { AuthContext } from '../../context/AuthContext';
+
 const Header = () => {
+  const {user} = useContext(AuthContext); 
   return (
     <div className="bg-white shadow-sm px-6 py-3 flex items-center w-full gap-16">
       <Search />
@@ -17,9 +20,9 @@ const Header = () => {
         
         <div className="flex items-center">
           <div className="w-8 h-8 bg-green-500 rounded-full overflow-hidden mr-2">
-            <div className="w-full h-full flex items-center justify-center text-white font-semibold">R</div>
+              <img src={user.avatar} alt="Admin Avatar" className="w-full h-full object-cover" />
           </div>
-          <span className="font-medium text-gray-700">Randhir kumar</span>
+          <span className="font-medium text-gray-700">Admin</span>
           <svg className="w-5 h-5 ml-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
           </svg>

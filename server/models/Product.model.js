@@ -19,6 +19,7 @@ const ProductSchema = new mongoose.Schema({
     image_url: {
         type: String,
         required: true,
+        default: 'https://placehold.co/600x400/EEE/31343C',
     },
     size: {
         type: String,
@@ -28,7 +29,16 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    tags: {
+        type: String,
+        required: true,
+    },
+    images: {
+        type: Array,
+        required: true,
+    },
     
+
     created_at: {
         type: Date,
         default: Date.now,
