@@ -35,7 +35,7 @@ const Products = () => {
             <div key={product._id} className="border rounded-lg overflow-hidden shadow-md flex flex-col">
               <Link to={`/products/${product._id}`} className="block flex-grow">
                 <img 
-                  src={product.image_url || 'https://placehold.co/300x200'} 
+                  src={product.images[0] || 'https://placehold.co/300x200'}  
                   alt={product.name} 
                   className="w-full h-48 object-cover"
                 />

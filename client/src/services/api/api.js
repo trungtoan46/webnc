@@ -3,9 +3,6 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Khởi tạo token từ localStorage nếu có
@@ -21,6 +18,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
+    // Không set Content-Type mặc định để axios tự động xử lý
     return config;
   },
   (error) => {

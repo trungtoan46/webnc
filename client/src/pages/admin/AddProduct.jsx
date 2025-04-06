@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormControl, TextInput, Select, Textarea } from '@primer/react';
 import { FiUpload } from 'react-icons/fi';
-import { addProduct } from '../../services/api/admin';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../../services/api/api';
-import { useEffect } from 'react';
+import { addProduct } from '../../services/api/admin';
 
 const AddProduct = ({ onCancel }) => {
   const [formData, setFormData] = useState({
@@ -21,6 +20,7 @@ const AddProduct = ({ onCancel }) => {
     images: []
   });
 
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [colors, setColors] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -64,7 +64,7 @@ const AddProduct = ({ onCancel }) => {
       return;
     }
 
-    if (formData.images.length === 0) {
+    if (selectedFiles.length === 0) {
       toast.error('Vui lòng thêm ít nhất một hình ảnh sản phẩm');
       return;
     }
@@ -85,36 +85,54 @@ const AddProduct = ({ onCancel }) => {
     }
 
     try {
+      // Upload ảnh lên Cloudinary trước
+      const uploadData = new FormData();
+      selectedFiles.forEach(file => {
+        uploadData.append('images', file);
+      });
+
+      // Log để kiểm tra FormData trước khi upload
+      console.log('Files being uploaded:', selectedFiles);
+
+      // Sử dụng API instance để upload ảnh
+      const uploadResponse = await api.post('/upload', uploadData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log('Upload response:', uploadResponse);
+      
+      if (!uploadResponse.data || !uploadResponse.data.urls) {
+        throw new Error('Không nhận được URL ảnh từ server');
+      }
+
+      // Đảm bảo imageUrls là một mảng
+      const imageUrls = Array.isArray(uploadResponse.data.urls) 
+        ? uploadResponse.data.urls 
+        : [uploadResponse.data.urls];
+
+      console.log('Image URLs received:', imageUrls);
+
       // Chuẩn bị dữ liệu sản phẩm
       const productData = new FormData();
       productData.append('name', formData.name);
       productData.append('description', formData.description);
-      productData.append('price', formData.price);
+      productData.append('price', Number(formData.price));
       productData.append('category_id', formData.category);
       productData.append('size', sizes.join(','));
       productData.append('color', colors.join(','));
       productData.append('quantity', formData.quantity || 0);
       productData.append('is_active', true);
-      productData.append('tags', JSON.stringify(formData.tags));
-
-      // Thêm từng ảnh vào FormData
-      formData.images.forEach((image) => {
-        productData.append(`images`, image);
-      });
+      productData.append('tags', '["' + (formData.tags[0] || '') + '"]');
+      productData.append('images', JSON.stringify(imageUrls));
+      productData.append('image_url', imageUrls[0] || 'https://placehold.co/600x400/EEE/31343C');
 
       // Log để kiểm tra dữ liệu trước khi gửi
-      console.log('Dữ liệu sản phẩm:', {
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        category_id: formData.category,
-        size: sizes.join(','),
-        color: colors.join(','),
-        quantity: formData.quantity || 0,
-        is_active: true,
-        tags: formData.tags,
-        images: formData.images.map(img => img.name)
-      });
+      console.log('Dữ liệu sản phẩm trước khi gửi:');
+      for (let pair of productData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
 
       // Gọi API thêm sản phẩm
       const response = await addProduct(productData);
@@ -126,8 +144,8 @@ const AddProduct = ({ onCancel }) => {
       // Đóng form
       onCancel();
     } catch (error) {
-      console.error('Lỗi khi thêm sản phẩm:', error);
-      toast.error('Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại!');
+      console.error('Lỗi chi tiết:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || error.message || 'Có lỗi xảy ra khi thêm sản phẩm');
     }
   };
 
@@ -135,8 +153,7 @@ const AddProduct = ({ onCancel }) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-      tags: name === 'tags' ? value.split(',') : prev.tags
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -204,10 +221,18 @@ const AddProduct = ({ onCancel }) => {
         return;
       }
 
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, ...files]
-      }));
+      // Log để kiểm tra files
+      console.log('Files được chọn:', files.map(f => ({
+        name: f.name,
+        type: f.type,
+        size: f.size
+      })));
+
+      // Thêm files vào state
+      setSelectedFiles(prev => [...prev, ...files]);
+
+      // Log để kiểm tra state sau khi thêm ảnh
+      console.log('Selected files:', files);
     } catch (error) {
       console.error('Lỗi khi tải file:', error);
       toast.error('Có lỗi xảy ra khi tải file. Vui lòng thử lại!');
@@ -215,10 +240,7 @@ const AddProduct = ({ onCancel }) => {
   };
 
   const handleImageDelete = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };  
   const prices = [
     {
@@ -352,40 +374,22 @@ const AddProduct = ({ onCancel }) => {
                       {/* Kích cỡ sản phẩm */}
                     </FormControl>
                     <div className="mt-4 flex gap-10 flex-wrap ">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="relative group">
-                        
-                        <img src={URL.createObjectURL(image)} 
-                        alt={`Ảnh ${index + 1}`} 
-                        className='w-24 h-24 object-cover
-                         rounded-md 
-                        cursor-pointer hover:scale-150
-                        transition-transform
-                        group-hover:scale-150
-                        
-                        '
-                      />
-                        <button 
-                          onClick={() => handleImageDelete(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white 
-                                    w-6 h-6 flex items-center justify-center 
-                                    rounded-full text-sm font-bold shadow-md 
-                                    transition-transform 
-                                    
-                                    group-hover:translate-x-[50%]
-                                    group-hover:translate-y-[-50%]
-                                    group-hover:scale-150
-                                    "
-
-                                    id='delete-image'
-                        >
-                          ✕
-                        </button>
-                      </div>
-
-                    ))
-                
-                    }
+                      {selectedFiles.map((file, index) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={URL.createObjectURL(file)} 
+                            alt={`Ảnh ${index + 1}`} 
+                            className='w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150'
+                          />
+                          <button 
+                            onClick={() => handleImageDelete(index)}
+                            className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
+                            id='delete-image'
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
                     </div>                 
                   </div>
 

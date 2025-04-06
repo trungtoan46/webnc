@@ -1,7 +1,11 @@
 import api from './api';
 
 export const addProduct = async (product) => {
-    const response = await api.post('/admin/products', product);
+    const response = await api.post('/admin/products', product, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
     console.log(response);
     return response.data;
 };

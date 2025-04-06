@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { Product } = require('../../../models/index.model.js');
+const multer = require('multer');
+const upload = multer();
 
 // Get all products for admin
 router.get('/', async (req, res) => {
@@ -14,15 +16,50 @@ router.get('/', async (req, res) => {
 });
 
 // Create new product
-router.post('/', async (req, res) => {
+router.post('/', upload.array('images'), async (req, res) => {
   try {
-    const product = new Product(req.body);
-    console.log(product);
+    // Parse các trường text từ req.body
+    const {
+      name,
+      description,
+      price,
+      category_id,
+      size,
+      color,
+      quantity,
+      is_active,
+      tags
+    } = req.body;
+
+    // Parse tags nếu là JSON string
+    const parsedTags = Array.isArray(tags) ? tags : tags ? [tags] : [];
+       
+
+    // Lấy danh sách tên file ảnh (nếu bạn muốn lưu tên)
+    const images = req.files.map(file => file.originalname);
+
+    // Hoặc nếu muốn lưu ảnh dạng buffer:
+    // const images = req.files.map(file => file.buffer);
+
+    // Tạo mới sản phẩm
+    const product = new Product({
+      name,
+      description,
+      price,
+      category_id,
+      size,
+      color,
+      quantity,
+      is_active,  
+      tags: parsedTags,
+      images
+    });
+
     await product.save();
     res.status(201).json(product);
   } catch (error) {
     console.error('Error creating product:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

@@ -14,6 +14,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import MainLayout from './layouts/MainLayout'
 import AddProduct from './pages/admin/AddProduct'
+import Products from './pages/Products'
 function App() {
   return (
     <ThemeProvider>
@@ -29,7 +30,7 @@ function App() {
               } />
               <Route path="/products" element={
                 <MainLayout>
-                  <Home />
+                  <Products />
                 </MainLayout>
               } />
               <Route path="/products/:id" element={
