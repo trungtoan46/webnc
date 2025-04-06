@@ -16,7 +16,7 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image_url: {
+    thumbnail: {
         type: String,
         required: true,
         default: 'https://placehold.co/600x400/EEE/31343C',
@@ -33,11 +33,7 @@ const ProductSchema = new mongoose.Schema({
         type: Array,
         required: true,
     },
-    images: {
-        type: Array,
-        required: true,
-    },
-
+   
     created_at: {
         type: Date,
         default: Date.now,
@@ -59,7 +55,10 @@ const ProductSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
-    
+    detail_images: {
+        type: Array,
+        default: [],
+    },
 });
 ProductSchema.plugin(AutoIncrement, { inc_field: 'product_id' });
 

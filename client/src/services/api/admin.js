@@ -1,13 +1,17 @@
 import api from './api';
 
-export const addProduct = async (product) => {
-    const response = await api.post('/admin/products', product, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
+export const addProduct = async (productData) => {
+  try {
+    const response = await api.post('/admin/products', productData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
-    console.log(response);
     return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
 };
 
 export const getProducts = async () => {

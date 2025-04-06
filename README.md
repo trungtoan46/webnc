@@ -186,6 +186,3 @@ npm run dev
 4. Push lên nhánh (`git push origin feature/TinhNangTuyetVoi`)
 5. Mở Pull Request
 
-## Giấy phép
-
-Dự án này được cấp phép theo Giấy phép MIT - xem tệp LICENSE để biết chi tiết. 

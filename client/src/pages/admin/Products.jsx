@@ -2,38 +2,45 @@ import React, { useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
 import {FormControl, TextInput} from '@primer/react'
 import AddProduct from './AddProduct';
+import axios from 'axios';
+import { useEffect } from 'react';
+import api from '../../services/api/api';
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(10);
 
   // Dữ liệu mẫu  
-  const products = [
-    {
-      id: 1,
-      name: 'Áo thun nam',
-      category: 'Áo',
-      price: '199.000đ',
-      stock: 100,
-      status: 'Còn hàng'
-    },
-    {
-      id: 2,
-      name: 'Quần jean nữ',
-      category: 'Quần',
-      price: '399.000đ',
-      stock: 50,
-      status: 'Còn hàng'
-    },
-    {
-      id: 3,
-      name: 'Giày sneaker',
-      category: 'Giày',
-      price: '599.000đ',
-      stock: 0,
-      status: 'Hết hàng'
+  
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get('/admin/products');
+      setProducts(response.data);
+    } catch (error) {
+      setError('Failed to fetch products');
     }
-  ];
+  };  
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  
+  if (error) {
+    return <div className='text-center py-10 text-red-500' >Error: {error}</div>;
+  }
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/admin/products/${id}`);
+      setProducts(products.filter(product => product.id !== id));
+    } catch (error) {
+      setError('Failed to delete product');
+    }
+  };
 
   if (showAddForm) {
     return <AddProduct onCancel={() => setShowAddForm(false)} />;
@@ -70,22 +77,22 @@ const Products = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Sản phẩm
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Danh mục
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Giá
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tồn kho
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Trạng thái
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Thao tác
                 </th>
               </tr>
@@ -98,25 +105,25 @@ const Products = () => {
                       <div className="h-10 w-10 flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full"
-                          src={`https://via.placeholder.com/40`}
+                          src={product.thumbnail ||`https://via.placeholder.com/40`}
                           alt=""
                         />
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                      <div className=" w-full">
+                        <div className="text-sm font-medium text-center text-gray-900">
                           {product.name}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.category}</div>
+                    <div className="text-sm text-center text-gray-900">{product.category}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.price}</div>
+                    <div className="text-sm text-center text-gray-900">{product.price}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.stock}</div>
+                    <div className="text-sm text-center text-gray-900">{product.stock}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -129,10 +136,14 @@ const Products = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button className="text-blue-600 hover:text-blue-900 mr-3">
-                      <FiEdit2 className="inline-block" />
+                      <FiEdit2 className="inline-block" 
+                      onClick={() => handleEdit(product._id)}
+                      />
                     </button>
                     <button className="text-red-600 hover:text-red-900">
-                      <FiTrash2 className="inline-block" />
+                      <FiTrash2 className="inline-block" 
+                      onClick={() => handleDelete(product._id)}
+                      />
                     </button>
                   </td>
                 </tr>

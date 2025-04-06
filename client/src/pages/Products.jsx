@@ -32,12 +32,13 @@ const Products = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.length > 0 ? (
           products.map((product) => (
-            <div key={product._id} className="border rounded-lg overflow-hidden shadow-md flex flex-col">
+            <div key={product._id} className="border rounded-lg
+             overflow-hidden shadow-md flex flex-col justify-between">
               <Link to={`/products/${product._id}`} className="block flex-grow">
                 <img 
-                  src={product.images[0] || 'https://placehold.co/300x200'}  
+                  src={product.thumbnail || 'https://placehold.co/300x200'}  
                   alt={product.name} 
-                  className="w-full h-48 object-cover"
+                  className="w-60 h-60 object-cover mx-auto"
                 />
                 <div className="p-4">
                   <h2 className="text-xl font-semibold mb-2">{product.name}</h2>

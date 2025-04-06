@@ -67,9 +67,9 @@ const ProductDetail = () => {
       <div className="flex flex-col sm:flex-row gap-8">
         <div className="sm:w-1/2">
           <img 
-            src={product.image_url || 'https://via.placeholder.com/600x400'} 
+            src={product.thumbnail || 'https://via.placeholder.com/600x400'} 
             alt={product.name} 
-            className="w-full h-auto rounded-lg shadow-md"
+            className="w-60 h-auto rounded-lg shadow-md"
           />
         </div>
         

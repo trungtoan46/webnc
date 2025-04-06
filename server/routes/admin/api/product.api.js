@@ -1,98 +1,90 @@
 const express = require('express');
 const router = express.Router();
-const { Product } = require('../../../models/index.model.js');
-const multer = require('multer');
-const upload = multer();
+const Product = require('../../../models/Product.model');
 
-// Get all products for admin
+// Get all products
 router.get('/', async (req, res) => {
-  try {
-    const products = await Product.find().populate('category');
-    res.json(products);
-  } catch (error) {
-    console.error('Error fetching admin products:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+    try {
+        const products = await Product.find()
+            .populate('category_id', 'name')
+            .sort({ created_at: -1 });
+        res.json(products);
+    } catch (error) {
+        console.error('Error getting products:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 });
 
 // Create new product
-router.post('/', upload.array('images'), async (req, res) => {
-  try {
-    // Parse các trường text từ req.body
-    const {
-      name,
-      description,
-      price,
-      category_id,
-      size,
-      color,
-      quantity,
-      is_active,
-      tags
-    } = req.body;
+router.post('/', async (req, res) => {
+    try {
+        const productData = req.body;
+        const product = new Product(productData);
+        await product.save();
+        res.status(201).json(product);
+    } catch (error) {
+        console.error('Error creating product:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
 
-    // Parse tags nếu là JSON string
-    const parsedTags = Array.isArray(tags) ? tags : tags ? [tags] : [];
-       
-
-    // Lấy danh sách tên file ảnh (nếu bạn muốn lưu tên)
-    const images = req.files.map(file => file.originalname);
-
-    // Hoặc nếu muốn lưu ảnh dạng buffer:
-    // const images = req.files.map(file => file.buffer);
-
-    // Tạo mới sản phẩm
-    const product = new Product({
-      name,
-      description,
-      price,
-      category_id,
-      size,
-      color,
-      quantity,
-      is_active,  
-      tags: parsedTags,
-      images
-    });
-
-    await product.save();
-    res.status(201).json(product);
-  } catch (error) {
-    console.error('Error creating product:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
+// Get product by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id)
+            .populate('category_id', 'name');
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.json(product);
+    } catch (error) {
+        console.error('Error getting product:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 });
 
 // Update product
 router.put('/:id', async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+    try {
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.json(product);
+    } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
-    res.json(product);
-  } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
 });
 
 // Delete product
 router.delete('/:id', async (req, res) => {
-  try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+    try {
+        console.log('Deleting product with ID:', req.params.id);
+        const product = await Product.findById(req.params.id);
+        
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        await Product.findByIdAndDelete(req.params.id);
+        res.json({ 
+            success: true,
+            message: 'Product deleted successfully',
+            deletedProduct: product 
+        });
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to delete product', 
+            error: error.message 
+        });
     }
-    res.json({ message: 'Product deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting product:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
 });
 
 module.exports = router; 

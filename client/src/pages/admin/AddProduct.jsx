@@ -21,10 +21,12 @@ const AddProduct = ({ onCancel }) => {
   });
 
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [sizes, setSizes] = useState([]);
   const [colors, setColors] = useState([]);
   const [categories, setCategories] = useState([]);
 
+  
   useEffect(() => {
     const fetchCategories = async () => {
       const response = await api.get('/categories');
@@ -40,103 +42,157 @@ const AddProduct = ({ onCancel }) => {
       priceInput.value = price;
     }
   };
+  const handleThumbnailChange = (e) => {
+    try {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Kiểm tra loại file
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        toast.error('Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG');
+        return;
+      }
+
+      // Kiểm tra kích thước file (tối đa 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        toast.error('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+
+      setThumbnailFile(file);
+    } catch (error) {
+      console.error('Lỗi khi tải file:', error);
+      toast.error('Có lỗi xảy ra khi tải file. Vui lòng thử lại!');
+    }
+  };
+
+  const handleDetailImagesChange = (e) => {
+    try {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+
+      // Kiểm tra loại file
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      const invalidFiles = files.filter(file => !validTypes.includes(file.type));
+      
+      if (invalidFiles.length > 0) {
+        toast.error('Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG');
+        return;
+      }
+
+      // Kiểm tra kích thước file (tối đa 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const oversizedFiles = files.filter(file => file.size > maxSize);
+      
+      if (oversizedFiles.length > 0) {
+        toast.error('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+
+      setSelectedFiles(prev => [...prev, ...files]);
+    } catch (error) {
+      console.error('Lỗi khi tải file:', error);
+      toast.error('Có lỗi xảy ra khi tải file. Vui lòng thử lại!');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Kiểm tra các trường bắt buộc
-    const requiredFields = {
-      name: 'Tên sản phẩm',
-      description: 'Mô tả sản phẩm',
-      price: 'Giá sản phẩm',
-      category: 'Danh mục'
-    };
-
-    const emptyFields = [];
-    for (const [field, label] of Object.entries(requiredFields)) {
-      if (!formData[field]) {
-        emptyFields.push(label);
-      }
-    }
-
-    if (emptyFields.length > 0) {
-      toast.error(`Vui lòng nhập: ${emptyFields.join(', ')}`);
-      return;
-    }
-
-    if (selectedFiles.length === 0) {
-      toast.error('Vui lòng thêm ít nhất một hình ảnh sản phẩm');
-      return;
-    }
-
-    if (sizes.length === 0) {
-      toast.error('Vui lòng chọn ít nhất một kích cỡ');
-      return;
-    }
-
-    if (colors.length === 0) {
-      toast.error('Vui lòng chọn ít nhất một màu sắc');
-      return;
-    }
-
-    if (formData.tags.length === 0) {
-      toast.error('Vui lòng thêm ít nhất một thẻ cho sản phẩm');
-      return;
-    }
-
     try {
-      // Upload ảnh lên Cloudinary trước
-      const uploadData = new FormData();
-      selectedFiles.forEach(file => {
-        uploadData.append('images', file);
-      });
+      // Kiểm tra các trường bắt buộc
+      const requiredFields = {
+        name: 'Tên sản phẩm',
+        description: 'Mô tả sản phẩm',
+        price: 'Giá sản phẩm',
+        category: 'Danh mục'
+      };
 
-      // Log để kiểm tra FormData trước khi upload
-      console.log('Files being uploaded:', selectedFiles);
+      const emptyFields = [];
+      for (const [field, label] of Object.entries(requiredFields)) {
+        if (!formData[field]) {
+          emptyFields.push(label);
+        }
+      }
 
-      // Sử dụng API instance để upload ảnh
-      const uploadResponse = await api.post('/upload', uploadData, {
+      if (emptyFields.length > 0) {
+        toast.error(`Vui lòng nhập: ${emptyFields.join(', ')}`);
+        return;
+      }
+
+      if (!thumbnailFile) {
+        toast.error('Vui lòng thêm ảnh đại diện sản phẩm');
+        return;
+      }
+
+      if (selectedFiles.length === 0) {
+        toast.error('Vui lòng thêm ít nhất một ảnh chi tiết sản phẩm');
+        return;
+      }
+
+      if (sizes.length === 0) {
+        toast.error('Vui lòng chọn ít nhất một kích cỡ');
+        return;
+      }
+
+      if (colors.length === 0) {
+        toast.error('Vui lòng chọn ít nhất một màu sắc');
+        return;
+      }
+
+      if (formData.tags.length === 0) {
+        toast.error('Vui lòng thêm ít nhất một thẻ cho sản phẩm');
+        return;
+      }
+
+      // Upload ảnh đại diện
+      const thumbnailFormData = new FormData();
+      thumbnailFormData.append('images', thumbnailFile);
+      
+      const thumbnailResponse = await api.post('/images/upload', thumbnailFormData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
-      console.log('Upload response:', uploadResponse);
-      
-      if (!uploadResponse.data || !uploadResponse.data.urls) {
-        throw new Error('Không nhận được URL ảnh từ server');
-      }
+      // Upload ảnh chi tiết
+      const detailFormData = new FormData();
+      selectedFiles.forEach(file => {
+        detailFormData.append('images', file);
+      });
 
-      // Đảm bảo imageUrls là một mảng
-      const imageUrls = Array.isArray(uploadResponse.data.urls) 
-        ? uploadResponse.data.urls 
-        : [uploadResponse.data.urls];
+      const detailResponse = await api.post('/images/upload', detailFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
-      console.log('Image URLs received:', imageUrls);
+      const thumbnailUrl = thumbnailResponse.data.urls[0];
+      const detailUrls = detailResponse.data.urls;
 
       // Chuẩn bị dữ liệu sản phẩm
-      const productData = new FormData();
-      productData.append('name', formData.name);
-      productData.append('description', formData.description);
-      productData.append('price', Number(formData.price));
-      productData.append('category_id', formData.category);
-      productData.append('size', sizes.join(','));
-      productData.append('color', colors.join(','));
-      productData.append('quantity', formData.quantity || 0);
-      productData.append('is_active', true);
-      productData.append('tags', '["' + (formData.tags[0] || '') + '"]');
-      productData.append('images', JSON.stringify(imageUrls));
-      productData.append('image_url', imageUrls[0] || 'https://placehold.co/600x400/EEE/31343C');
+      const productData = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        price: Number(formData.price),
+        category_id: formData.category,
+        size: sizes.join(','),
+        color: colors.join(','),
+        quantity: Number(formData.quantity) || 0,
+        is_active: true,
+        tags: formData.tags.filter(tag => tag.trim()),
+        thumbnail: thumbnailUrl,
+        detail_images: detailUrls
+      };
 
       // Log để kiểm tra dữ liệu trước khi gửi
-      console.log('Dữ liệu sản phẩm trước khi gửi:');
-      for (let pair of productData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
-      }
+      console.log('Dữ liệu sản phẩm trước khi gửi:', productData);
 
       // Gọi API thêm sản phẩm
       const response = await addProduct(productData);
-      console.log('Phản hồi từ server:', response);
+      console.log('Phản hồi từ server:', response.data);
       
       // Hiển thị thông báo thành công
       toast.success('Thêm sản phẩm thành công!');
@@ -196,47 +252,6 @@ const AddProduct = ({ onCancel }) => {
     if (baseColor === "black") return "bg-black text-white border-2 border-gray-300";
   
     return `bg-${baseColor}-100 text-${baseColor}-500 border border-gray-300`;
-  };
-
-  const handleFileChange = (e) => {
-    try {
-      const files = Array.from(e.target.files);
-      if (!files.length) return;
-
-      // Kiểm tra loại file
-      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-      const invalidFiles = files.filter(file => !validTypes.includes(file.type));
-      
-      if (invalidFiles.length > 0) {
-        toast.error('Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG');
-        return;
-      }
-
-      // Kiểm tra kích thước file (tối đa 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      const oversizedFiles = files.filter(file => file.size > maxSize);
-      
-      if (oversizedFiles.length > 0) {
-        toast.error('Kích thước file không được vượt quá 5MB');
-        return;
-      }
-
-      // Log để kiểm tra files
-      console.log('Files được chọn:', files.map(f => ({
-        name: f.name,
-        type: f.type,
-        size: f.size
-      })));
-
-      // Thêm files vào state
-      setSelectedFiles(prev => [...prev, ...files]);
-
-      // Log để kiểm tra state sau khi thêm ảnh
-      console.log('Selected files:', files);
-    } catch (error) {
-      console.error('Lỗi khi tải file:', error);
-      toast.error('Có lỗi xảy ra khi tải file. Vui lòng thử lại!');
-    }
   };
 
   const handleImageDelete = (index) => {
@@ -317,9 +332,43 @@ const AddProduct = ({ onCancel }) => {
                 {/* Hình ảnh sản phẩm */}
                 <section>
                   <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">
-                    Hình Ảnh</h3>
+                    Hình Ảnh Đại Diện</h3>
                   <label className="border-2 border-dashed rounded-lg p-8 
-                  text-center bg-gray-50 cursor-pointer w-full h-48 
+                  text-center bg-gray-50 cursor-pointer w-full h-36
+                  flex flex-col items-center justify-center">
+                    <FiUpload className="mx-auto h-12 w-12 text-blue-400" />
+                    <div className="mt-2">
+                      <p className="text-blue-600 font-medium">Thêm Tệp</p>
+                      <p className="text-sm text-gray-500">Hoặc kéo và thả tệp</p>
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={handleThumbnailChange}
+                    />
+                  </label>
+                  {thumbnailFile && (
+                    <div className="mt-4 relative group w-24 h-24">
+                      <img 
+                        src={URL.createObjectURL(thumbnailFile)} 
+                        alt="Ảnh đại diện" 
+                        className="w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150"
+                      />
+                      <button 
+                          onClick={() => setThumbnailFile(null)}
+                          className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
+                        >
+                          ✕
+                        </button>
+                      
+                    </div>
+                  )}
+                </section>
+                <section>
+                  <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">
+                    Hình Ảnh Chi Tiết</h3>
+                  <label className="border-2 border-dashed rounded-lg p-8 
+                  text-center bg-gray-50 cursor-pointer w-full h-36
                   flex flex-col items-center justify-center">
                     <FiUpload className="mx-auto h-12 w-12 text-blue-400" />
                     <div className="mt-2">
@@ -330,12 +379,26 @@ const AddProduct = ({ onCancel }) => {
                       type="file"
                       multiple
                       className="hidden"
-                      onChange={(e) => {
-                        handleFileChange(e);
-                      }}  
-                      
+                      onChange={handleDetailImagesChange}
                     />
                   </label>
+                  <div className="mt-4 flex gap-10 flex-wrap">
+                    {selectedFiles.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={URL.createObjectURL(file)} 
+                          alt={`Ảnh ${index + 1}`} 
+                          className="w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150"
+                        />
+                        <button 
+                          onClick={() => handleImageDelete(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </section>
 
                 {/* Giá sản phẩm */}
@@ -373,24 +436,6 @@ const AddProduct = ({ onCancel }) => {
                       </div>
                       {/* Kích cỡ sản phẩm */}
                     </FormControl>
-                    <div className="mt-4 flex gap-10 flex-wrap ">
-                      {selectedFiles.map((file, index) => (
-                        <div key={index} className="relative group">
-                          <img 
-                            src={URL.createObjectURL(file)} 
-                            alt={`Ảnh ${index + 1}`} 
-                            className='w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150'
-                          />
-                          <button 
-                            onClick={() => handleImageDelete(index)}
-                            className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
-                            id='delete-image'
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>                 
                   </div>
 
                     {/* Kích cỡ sản phẩm */}
@@ -460,8 +505,7 @@ const AddProduct = ({ onCancel }) => {
                       ))}
                     </select>
                     </div>
-                    <button className="text-blue-600 hover:text-blue-800
-                    text-sm font-medium text-left w-full">Tạo Mới</button>
+                    
                   </div>
                 </section>
 
