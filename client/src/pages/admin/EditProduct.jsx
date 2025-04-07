@@ -6,7 +6,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import api from '../../services/api/api';
 import { addProduct } from '../../services/api/admin';
 
-const AddProduct = ({ onCancel }) => {
+const EditProduct = ({ onCancel, productId }) => {
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -19,15 +24,6 @@ const AddProduct = ({ onCancel }) => {
     tags: [],
     images: []
   });
-
-  const [selectedFiles, setSelectedFiles] = useState([]);
-  const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [sizes, setSizes] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   
   useEffect(() => {
     const fetchCategories = async () => {
@@ -35,16 +31,48 @@ const AddProduct = ({ onCancel }) => {
       setCategories(response.data);
     };
     fetchCategories();
-  }, []);
-  const fetchProducts = async () => {
+
+    if (productId) {
+      const fetchProductById = async () => {
+        try {
+          const response = await api.get(`/products/${productId}`);
+          const productData = response.data;
+          const detailImageFiles = await Promise.all(productData.detail_images.map(urlToFile));
+          const thumbnailFile = await urlToFile(productData.thumbnail || null);
+          setThumbnailFile(thumbnailFile);
+          setSelectedFiles(detailImageFiles || []);
+          setSizes(productData.size || []);
+          setColors(productData.color || []);
+          setFormData({
+            name: productData.name || '',
+            description: productData.description || '',
+            category: productData.category_id || '',
+            price: productData.price || '',
+            tags: productData.tags || [],   
+            images: detailImageFiles,
+            thumbnail: thumbnailFile
+          });
+        } catch (error) {
+          console.error('Lỗi khi tải sản phẩm:', error);
+          toast.error('Không thể tải thông tin sản phẩm');
+        }
+      };
+      fetchProductById();
+    }
+  }, [productId]);
+
+  const urlToFile = async (url) => {
     try {
-      const response = await api.get('/admin/products');
-    setProducts(response.data);
-  } catch (error) {
-    setError('Failed to fetch products' + error.message);
-  }
-};
-  fetchProducts();
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const fileName = url.split('/').pop() || ''; // Lấy tên file từ URL hoặc mặc định
+      return new File([blob], fileName, { type: blob.type });
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      return null;
+    }
+  };
+
   const handlePriceChange = (price) => {
     const priceInput = document.getElementById('price-input');
     if (priceInput.value == price) {
@@ -112,7 +140,7 @@ const AddProduct = ({ onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.loading('Đang thêm sản phẩm...');
+    toast.loading('Đang cập nhật sản phẩm...');
     try {
       // Kiểm tra các trường bắt buộc
       const requiredFields = {
@@ -204,13 +232,12 @@ const AddProduct = ({ onCancel }) => {
       
       // Hiển thị thông báo thành công
       toast.dismiss();
-      toast.success('Thêm sản phẩm thành công!');
+      toast.success('Cập nhật sản phẩm thành công!');
       clearInfo();
-      fetchProducts();  
-      
+      onCancel();
     } catch (error) {
       console.error('Lỗi chi tiết:', error.response?.data || error.message);
-      toast.error(error.response?.data?.message || error.message || 'Có lỗi xảy ra khi thêm sản phẩm');
+      toast.error(error.response?.data?.message || error.message || 'Có lỗi xảy ra khi cập nhật sản phẩm');
     }
   };
 
@@ -275,12 +302,12 @@ const AddProduct = ({ onCancel }) => {
 
   const getColorClass = (color) => {
     const baseColor = color.toLowerCase();
-  
-    if (baseColor === "white") return "bg-white text-black";
+
+    if (baseColor === "white") return "bg-green-100 text-black border-2 border-gray-300";
     if (baseColor === "black") return "bg-black text-white border-2 border-gray-300";
-  
+
     return `bg-${baseColor}-100 text-${baseColor}-500 border border-gray-300`;
-  };
+};
 
   const handleImageDelete = (index) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
@@ -297,10 +324,8 @@ const AddProduct = ({ onCancel }) => {
     {
       name: 'Giá 2',
       value: 369000
-    },
-    
+    }
   ]
-
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -318,7 +343,7 @@ const AddProduct = ({ onCancel }) => {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h2 className="text-xl font-semibold text-blue-600">Thêm Sản Phẩm</h2>
+            <h2 className="text-xl font-semibold text-blue-600">Cập Nhật Sản Phẩm</h2>
             
           </div>
         </div>
@@ -332,27 +357,58 @@ const AddProduct = ({ onCancel }) => {
                 <section>
                   <h3 className="text-base font-semibold text-blue-600 mb-4 text-center">Thông Tin</h3>
                   {/* Tên sản phẩm */}
-                  <FormControl className="mb-4">
-                    <label className="text-sm font-medium text-gray-900 text-center block">Tên Sản Phẩm</label>
-                    <input
+                  <FormControl>
+                    <FormControl.Label
+                    sx={{
+                      color: "#2563eb",
+                      marginBottom: "10px"
+                    }}
+                    >Tên Sản Phẩm</FormControl.Label>
+                    <TextInput
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Áo thun mùa hè"
-                      className="text-gray-900 border-2 border-gray-300 rounded-md p-2"
+                      sx={
+                        {
+                          "& input": {
+                            color: "#1F2937",
+                            textAlign: "left",
+                            padding: "4px",
+                            border: "2px solid #d1d5db",
+                            borderRadius: "8px",
+                          }
+                        }
+                      }
                     />
                   </FormControl>
 
                   {/* Mô tả sản phẩm */}  
                   <FormControl>
-                    <label className="text-sm font-medium text-gray-700 text-center block">Mô Tả Sản Phẩm</label>
-                    <textarea   
+                    <FormControl.Label
+                    sx={{
+                      color: "#2563eb",
+                      marginBottom: "10px",
+                      marginTop: "10px" 
+                    }}
+                    >Mô Tả Sản Phẩm</FormControl.Label>
+                    <Textarea   
                       name="description"
                       value={formData.description}
                       onChange={handleChange}
                       placeholder="Nhập mô tả sản phẩm"
                       rows={4}
-                      className="text-gray-900 w-3/4 border-2 border-gray-300 rounded-md p-2"
+                      sx={
+                        {
+                          "& textarea": {
+                            color: "#1F2937",
+                            textAlign: "left",
+                            border: "2px solid #d1d5db",
+                            borderRadius: "8px",
+                            padding: "10px"
+                          }
+                        }
+                      }
                     />
                   </FormControl>
                 </section>
@@ -434,16 +490,30 @@ const AddProduct = ({ onCancel }) => {
                   <h3 className="text-base font-semibold text-blue-600
                    mb-4 text-left">Giá</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <FormControl>
-                      <input
+                    <FormControl id="price-input">
+                      <FormControl.Label
+                      sx={{
+                        color: "#2563eb",
+                        marginBottom: "10px"
+                      }}
+                      >Giá Sản Phẩm</FormControl.Label>
+                      <TextInput
                         name="price"
                         type="number"
                         value={formData.price}
                         onChange={handleChange}
                         placeholder="Nhập giá"
-                        id='price-input'
-                        className="text-gray-900 text-center border-2 
-                        border-gray-300 rounded-md w-4/5"
+                        sx={
+                          {
+                            "& input":{
+                                color: "#1F2937",
+                                textAlign: "center",
+                                border: "2px solid #d1d5db",
+                                borderRadius: "8px",
+                            },
+                            width: "80%"
+                          }
+                        }
                       />
                       <div className='flex gap-5 justify-center'>
                         {prices.map((price, index) => (
@@ -454,7 +524,6 @@ const AddProduct = ({ onCancel }) => {
                           '
                           onClick={() => handlePriceChange(price.value)}
                           >
-                            
                             {price.value.toLocaleString('vi-VN', {
                               style: 'currency',
                               currency: 'VND'
@@ -469,8 +538,13 @@ const AddProduct = ({ onCancel }) => {
                     {/* Kích cỡ sản phẩm */}
                 </section>
                     <div className="">
-                      <FormControl className="mb-4">
-                        <label className="text-sm font-medium text-gray-700 text-center block">Kích Cỡ</label>
+                      <FormControl>
+                        <FormControl.Label
+                        sx={{
+                          color: "#2563eb",
+                          marginBottom: "10px"
+                        }}
+                        >Kích Cỡ</FormControl.Label>
                         <div className="flex flex-wrap gap-2 justify-center">
                           {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
                             <button
@@ -489,7 +563,13 @@ const AddProduct = ({ onCancel }) => {
 
                       </FormControl>
                       <FormControl>
-                        <label className="text-sm font-medium text-gray-700 text-center block">Màu Sắc</label>
+                        <FormControl.Label
+                        sx={{
+                          color: "#2563eb",
+                          marginBottom: "10px",
+                          marginTop: "10px"
+                        }}
+                        >Màu Sắc</FormControl.Label>
                         <div className="flex pr-4 flex-wrap gap-2 justify-start ">
                           {['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Black', 'White'].map(color => (
                             <button key={color}
@@ -515,12 +595,10 @@ const AddProduct = ({ onCancel }) => {
             <div className="p-6 bg-gray-50">
               <div className="space-y-6">
                 <section>
-                  <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">Danh Mục</h3>
-                  <div className="space-y-2 flex flex-col items-center justify-start">
-                    <div className='w-full text-left'>
-                    <select 
+                  <FormControl>
+                    <FormControl.Label>Danh Mục</FormControl.Label>
+                    <Select 
                       name="category" 
-                      id="category" 
                       value={formData.category} 
                       onChange={handleChange}
                       className="text-gray-900 border-2 border-gray-300 rounded-md mb-4 w-full lg:w-1/3 md:w-full"
@@ -531,87 +609,112 @@ const AddProduct = ({ onCancel }) => {
                           {category.name}
                         </option>
                       ))}
-                    </select>
-                    </div>
-                    
-                  </div>
+                    </Select>
+                  </FormControl>
                 </section>
 
-                <section
-                  name="tags"
-                  value={formData.tags }
-                  onChange={handleChange}
-
-                >
-                  <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">Thẻ</h3>
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      {formData.tags.map(tag => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 bg-gray-200 rounded-full text-sm
-                           text-gray-700 flex items-center lg:w-1/2 md:w-full"
-                        >
-                          {tag}
-                          <button
-                            onClick={() => handleRemoveTag(tag)}
-                            className="ml-1 text-gray-500 hover:text-gray-700"
+                <section>
+                  <FormControl>
+                    <FormControl.Label
+                    sx={{
+                        color: "#2563eb"
+                    }}
+                    >
+                        Thẻ
+                    </FormControl.Label>
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-2 justify-center mb-2">
+                        {formData.tags.map(tag => (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 bg-gray-200 rounded-full text-sm text-gray-700 flex items-center"
+                            
                           >
-                            ×
-                          </button>
-                        </span>
-                      ))}
+
+                            {tag}
+                            <button
+                              onClick={() => handleRemoveTag(tag)}
+                              className="ml-1 text-gray-500 hover:text-gray-700"
+                              sx={{
+                                "& button": {
+                                  color: "#1F2937",
+                                  textAlign: "left",
+                                  padding: "4px",
+                                  border: "2px solid #d1d5db",
+                                  borderRadius: "8px",
+                                }
+                              }}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <TextInput
+                        placeholder="Thêm thẻ"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAddTag(e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        sx={{
+                          "& input": {
+                            padding: "4px",
+                            border: "2px solid #d1d5db",
+                            borderRadius: "8px",
+                            textAlign: "left",
+                            color: "#1F2937",
+                          }
+                        }}
+                      />
                     </div>
-                    <input
-                      placeholder="Thêm thẻ"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleAddTag(e.target.value);
-                          e.target.value = '';
-                        }
-                      }}
-                      className="text-gray-900 w-full text-left border-2
-                       border-gray-300 rounded-md mb-4 p-2"
-                    />
-                    <div className="flex flex-wrap gap-2 mt-2 justify-center">
-                        <span  className="px-2 py-1 bg-gray-100 rounded-full text-sm text-blue-600">
-                          
-                          
-                          
-                        </span>
-                      
-                    </div>
-                  </div>
+                  </FormControl>
                 </section>
-                {/* Cài đặt SEO */}
                 <section>
                   <h3 className="text-base font-semibold text-blue-600 mb-4 text-center">Cài Đặt SEO</h3>
-                  <FormControl className="mb-4">
-                    <label className="text-sm font-medium
-                     text-gray-700 text-center block">Tiêu Đề</label>
-                    <input
+                  <FormControl>
+                    <FormControl.Label
+                    sx={{
+                        color: "#2563eb",
+                        marginBottom: "10px",
+                        marginTop: "10px"
+                    }}
+                    >
+                        Tiêu Đề SEO
+                    </FormControl.Label>
+                    <TextInput
                       name="seoTitle"
                       value={formData.seoTitle}
                       onChange={handleChange}
                       placeholder="Nhập tiêu đề"
-                      className="text-gray-900 text-center border-2
-                       border-gray-300 rounded-md mb-4 lg:w-2/3 md:w-full"
+                      sx={{
+                        "& input": {
+                          color: "#1F2937",
+                          textAlign: "left",
+                          padding: "4px",
+                          border: "2px solid #d1d5db",
+                          borderRadius: "8px",
+                        }
+                      }}
                     />
                   </FormControl>
 
                   <FormControl>
-                    <label className="text-sm font-medium text-gray-700 text-center block">Mô Tả</label>
-                    <textarea
+                    <FormControl.Label sx={{
+                        color: "#2563eb",
+                        margin: "10px"
+                    }}>Mô Tả SEO</FormControl.Label>
+                    <Textarea
                       name="seoDescription"
                       value={formData.seoDescription}
                       onChange={handleChange}
                       rows={3}
-                      className="text-gray-900 text-center border-2
-                       border-gray-300 rounded-md mb-4 lg:w-2/3 md:w-full"
+                      className="text-gray-900 text-center border-2 border-gray-300 rounded-md mb-4 lg:w-2/3 md:w-full"
                     />
                   </FormControl>
-                  
                 </section>
+                {/* Cài đặt SEO */}
                 <div className="space-x-2">
                     <button
                       onClick={onCancel}
@@ -636,4 +739,4 @@ const AddProduct = ({ onCancel }) => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;

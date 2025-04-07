@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import api from '../../services/api/api';
+import { toast, ToastContainer } from 'react-toastify';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -33,14 +34,18 @@ const Categories = () => {
         try {
             if (editingCategory) {
                 await api.put(`/categories/${editingCategory._id}`, formData);
+
             } else {
                 await api.post('/categories', formData);
+
             }
             setShowModal(false);
             setEditingCategory(null);
             setFormData({ name: '', description: '' });
+            toast.success('Danh mục đã được lưu');
             fetchCategories();
         } catch (error) {
+            toast.error('Lỗi khi lưu danh mục' + error.message);
             console.error('Error saving category:', error);
         }
     };
@@ -59,6 +64,7 @@ const Categories = () => {
             try {
                 await api.delete(`/categories/${categoryId}`);
                 fetchCategories();
+                toast.success('Danh mục đã được xóa');
             } catch (error) {
                 console.error('Error deleting category:', error);
             }
@@ -67,6 +73,17 @@ const Categories = () => {
 
     return (
         <div className="p-6">
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-semibold text-gray-800">Quản lý danh mục</h1>
@@ -89,13 +106,13 @@ const Categories = () => {
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Tên danh mục
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Mô tả
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Thao tác
                                 </th>
                             </tr>
@@ -116,17 +133,17 @@ const Categories = () => {
                             ) : (
                                 categories.map((category) => (
                                     <tr key={category._id}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <div className="text-sm font-medium text-gray-900">
                                                 {category.name}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 text-center">
                                             <div className="text-sm text-gray-500">
                                                 {category.description || 'Không có mô tả'}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                        <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <button
                                                 onClick={() => handleEdit(category)}
                                                 className="text-blue-600 hover:text-blue-900 mr-4"
@@ -157,25 +174,30 @@ const Categories = () => {
                         </h2>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                <label className="block text-gray-700 
+                                text-sm font-bold mb-2">
                                     Tên danh mục
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full p-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                                    className="w-full p-2
+                                    text-gray-700
+                                     border rounded-lg focus:outline-none
+                                      focus:border-blue-500"
                                     required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                <label className="block text-gray-700
+                                 text-sm font-bold mb-2">
                                     Mô tả
                                 </label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full p-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                                    className="w-full p-2 text-gray-700 border rounded-lg focus:outline-none focus:border-blue-500"
                                     rows="3"
                                 />
                             </div>

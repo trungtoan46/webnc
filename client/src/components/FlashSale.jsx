@@ -56,24 +56,24 @@ const FlashSale = () => {
         <div className="flashsale__countdown">
           <div className="ega-badge-ctd">
             <div>
-              <div className="ega-badge-ctd__item ega-badge-ctd__h">
+              <div className="ega-badge-ctd__item ega-badge-ctd__h text-gray-800">
                 {String(timeLeft.hours).padStart(2, "0")}
               </div>
-              <span>Giờ</span>
+              <span className="text-gray-800">Giờ</span>
             </div>
             <div className="ega-badge-ctd__colon">:</div>
             <div>
-              <div className="ega-badge-ctd__item ega-badge-ctd__m">
+              <div className="ega-badge-ctd__item ega-badge-ctd__m text-gray-800">
                 {String(timeLeft.minutes).padStart(2, "0")}
               </div>
-              <span>Phút</span>
+              <span className="text-gray-800">Phút</span>
             </div>
             <div className="ega-badge-ctd__colon">:</div>
             <div>
-              <div className="ega-badge-ctd__item ega-badge-ctd__s">
+              <div className="ega-badge-ctd__item ega-badge-ctd__s text-gray-800">
                 {String(timeLeft.seconds).padStart(2, "0")}
               </div>
-              <span>Giây</span>
+              <span className="text-gray-800">Giây</span>
             </div>
           </div>
         </div>

@@ -28,12 +28,12 @@ const Sidebar = ({ sidebarActive, setSidebarActive }) => {
     <div className="h-screen w-64 bg-white border-r flex flex-col">
       {/* Logo & Search */}
       <div className="p-4 border-b">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">EGA Admin</h2>
+        <a   href="/"  className="text-xl font-bold text-gray-800 mb-4 block">EGA Admin</a>
         <div className="relative">
           <input
             type="text"
             placeholder="Search..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-2 text-gray-700 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500"
           />
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         </div>

@@ -37,5 +37,4 @@ router.get('/category/:categoryId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-module.exports = router; 
+module.exports = router;

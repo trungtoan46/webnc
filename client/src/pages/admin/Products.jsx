@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
 import {FormControl, TextInput} from '@primer/react'
 import AddProduct from './AddProduct';
-import axios from 'axios';
+import EditProduct from './EditProduct';
 import { useEffect } from 'react';
 import api from '../../services/api/api';
 
@@ -12,38 +12,67 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(10);
-
-  // Dữ liệu mẫu  
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [productId, setProductId] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    tags: [],
+    images: []
+  });
   
   const fetchProducts = async () => {
     try {
       const response = await api.get('/admin/products');
       setProducts(response.data);
     } catch (error) {
-      setError('Failed to fetch products');
+      setError('Failed to fetch products' + error.message);
     }
   };  
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  
-  if (error) {
-    return <div className='text-center py-10 text-red-500' >Error: {error}</div>;
-  }
   const handleDelete = async (id) => {
     try {
       await api.delete(`/admin/products/${id}`);
       setProducts(products.filter(product => product.id !== id));
+      fetchProducts();
     } catch (error) {
-      setError('Failed to delete product');
+      setError('Failed to delete product' + error.message);
     }
   };
 
+  const handleEdit = async (id) => {
+    try {
+      const response = await api.get(`/admin/products/${id}`);
+      setFormData({
+        name: response.data.name,
+        description: response.data.description, 
+        price: response.data.price,
+        category: response.data.category_id,
+        tags: response.data.tags,
+        images: response.data.images,
+      });
+      setProductId(id);
+      setShowEditForm(true);
+    } catch (error) {
+      setError('Failed to fetch product' + error.message);
+    }
+  };
+
+  if (error) {
+    return <div className='text-center py-10 text-red-500' >Error: {error}</div>;
+  }
+
   if (showAddForm) {
     return <AddProduct onCancel={() => setShowAddForm(false)} />;
+  }
+
+  if (showEditForm) {
+    return <EditProduct onCancel={() => setShowEditForm(false)} productId={productId} />;
   }
 
   return (
@@ -99,7 +128,7 @@ const Products = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {products.map((product) => (
-                <tr key={product.id}>
+                <tr key={product._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
