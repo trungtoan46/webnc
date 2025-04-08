@@ -99,7 +99,7 @@ const Nav = () => {
       <div className={`${isMenuOpen ? 'block' : 'hidden'} md:flex md:items-center w-full md:w-auto mt-4 md:mt-0`}>
         <div className="flex flex-col md:flex-row items-center space-x-4">
           {/* Category dropdown */}
-          <DropDownFullSize title="Sản phẩm" items={items} />
+          <DropDownFullSize title="Sản phẩm" items={items} link="/products" />
 
           {/* Deal dropdown */}
           <Dropdown title="Deal" items={[

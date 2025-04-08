@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const DropDownFullSize = ({ title, items }) => {
+const DropDownFullSize = ({ title, items, link }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -11,7 +11,7 @@ const DropDownFullSize = ({ title, items }) => {
       onMouseLeave={() => setIsOpen(false)}
     >
       <div className="flex items-center font-semibold text-lg text-black hover:text-blue-600 px-4 py-2 cursor-pointer">
-        {title}
+         <Link to={link}  className='hover:text-blue-600 text-black'>{title}</Link>
         <svg
           className={`ml-2 w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="currentColor"
@@ -42,7 +42,7 @@ const DropDownFullSize = ({ title, items }) => {
                     <div key={groupIndex} className="px-4 md:pl-20">
                       {/* Tiêu đề nhóm */}
                       <div className="text-lg font-bold text-gray-900 mb-2">
-                        <Link to={group.title.to}>{group.title.label}</Link>
+                        <Link to={link}>{group.title.label}</Link>
                       </div>
 
                       {/* Danh sách mục */}

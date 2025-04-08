@@ -216,10 +216,10 @@ const AddProduct = ({ onCancel }) => {
 
   const clearInfo = () => {
     setFormData({
-      name: '',
+        name: '',
       description: '',
-      category: '',
-      price: '',
+        category: '',
+        price: '',
       discountPrice: '',
       weight: '',
       hasOptions: false,
@@ -233,7 +233,7 @@ const AddProduct = ({ onCancel }) => {
     setColors([]);
   };
 
-  const handleChange = (e) => {
+    const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -302,7 +302,7 @@ const AddProduct = ({ onCancel }) => {
   ]
 
 
-  return (
+    return ( 
     <div className="min-h-screen bg-gray-100">
       <ToastContainer
         position="top-right"
@@ -341,10 +341,10 @@ const AddProduct = ({ onCancel }) => {
                       placeholder="Áo thun mùa hè"
                       className="text-gray-900 border-2 border-gray-300 rounded-md p-2"
                     />
-                  </FormControl>
+                    </FormControl>
 
                   {/* Mô tả sản phẩm */}  
-                  <FormControl>
+                    <FormControl>
                     <label className="text-sm font-medium text-gray-700 text-center block">Mô Tả Sản Phẩm</label>
                     <textarea   
                       name="description"
@@ -354,7 +354,7 @@ const AddProduct = ({ onCancel }) => {
                       rows={4}
                       className="text-gray-900 w-3/4 border-2 border-gray-300 rounded-md p-2"
                     />
-                  </FormControl>
+                    </FormControl>
                 </section>
 
                 {/* Hình ảnh sản phẩm */}
@@ -487,8 +487,8 @@ const AddProduct = ({ onCancel }) => {
                           ))}
                         </div>
 
-                      </FormControl>
-                      <FormControl>
+                    </FormControl>
+                    <FormControl>
                         <label className="text-sm font-medium text-gray-700 text-center block">Màu Sắc</label>
                         <div className="flex pr-4 flex-wrap gap-2 justify-start ">
                           {['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Black', 'White'].map(color => (
@@ -609,7 +609,7 @@ const AddProduct = ({ onCancel }) => {
                       className="text-gray-900 text-center border-2
                        border-gray-300 rounded-md mb-4 lg:w-2/3 md:w-full"
                     />
-                  </FormControl>
+                    </FormControl>
                   
                 </section>
                 <div className="space-x-2">
@@ -631,9 +631,9 @@ const AddProduct = ({ onCancel }) => {
           </div>
           
         </div>
-      </div>
-    </div>
-  );
+            </div>
+        </div>
+    );
 };
 
 export default AddProduct;

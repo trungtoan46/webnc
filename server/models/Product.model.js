@@ -33,6 +33,11 @@ const ProductSchema = new mongoose.Schema({
         type: Array,
         required: true,
     },
+    sale_price: {
+        type: Number,
+        default: 0,
+        required: false,
+    },
    
     created_at: {
         type: Date,
