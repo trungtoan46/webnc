@@ -22,7 +22,10 @@ const EditProduct = ({ onCancel, productId }) => {
     hasOptions: false,
     isDigital: false,
     tags: [],
-    images: []
+    images: [],
+    quantity: 0,
+    sizes: [],
+    color: []
   });
   
   useEffect(() => {
@@ -48,9 +51,10 @@ const EditProduct = ({ onCancel, productId }) => {
             description: productData.description || '',
             category: productData.category_id || '',
             price: productData.price || '',
-            tags: productData.tags || [],   
+            tags: Array.isArray(productData.tags) ? productData.tags : [],   
             images: detailImageFiles,
-            thumbnail: thumbnailFile
+            thumbnail: thumbnailFile,
+            quantity: productData.quantity || 0
           });
         } catch (error) {
           console.error('Lỗi khi tải sản phẩm:', error);
@@ -208,6 +212,7 @@ const EditProduct = ({ onCancel, productId }) => {
           'Content-Type': 'multipart/form-data'
         }
       });
+      console.log(detailResponse.size);
 
       const thumbnailUrl = thumbnailResponse.data.urls[0];
       const detailUrls = detailResponse.data.urls;
@@ -218,8 +223,8 @@ const EditProduct = ({ onCancel, productId }) => {
         description: formData.description.trim(),
         price: Number(formData.price),
         category_id: formData.category,
-        size: sizes.join(','),
-        color: colors.join(','),
+        size: Array.isArray(sizes) ? sizes.join(',') : sizes,
+        color: Array.isArray(colors) ? colors.join(',') : colors,
         quantity: Number(formData.quantity) || 0,
         is_active: true,
         tags: formData.tags.filter(tag => tag.trim()),
@@ -236,6 +241,7 @@ const EditProduct = ({ onCancel, productId }) => {
       clearInfo();
       onCancel();
     } catch (error) {
+      toast.dismiss();
       console.error('Lỗi chi tiết:', error.response?.data || error.message);
       toast.error(error.response?.data?.message || error.message || 'Có lỗi xảy ra khi cập nhật sản phẩm');
     }
@@ -532,6 +538,32 @@ const EditProduct = ({ onCancel, productId }) => {
                         ))}
                       </div>
                       {/* Kích cỡ sản phẩm */}
+                    </FormControl>
+                    <FormControl>
+                      <FormControl.Label
+                      sx={{
+                        color: "#2563eb",
+                        marginBottom: "10px"
+                      }}
+                      >Số Lượng</FormControl.Label>
+                      <TextInput
+                        name="quantity"
+                        type="number"
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        placeholder="Nhập số lượng"
+                        sx={
+                          {
+                            "& input":{
+                                color: "#1F2937",
+                                textAlign: "center",
+                                border: "2px solid #d1d5db",
+                                borderRadius: "8px",
+                            },
+                            width: "80%"
+                          }
+                        }
+                      />
                     </FormControl>
                   </div>
 

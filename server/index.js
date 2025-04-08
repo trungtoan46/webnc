@@ -4,7 +4,34 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
+const { Server } = require('socket.io');
+const http = require('http');
 const app = express();
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Create Socket.IO server
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production' 
+      ? ['http://localhost:3001', 'http://localhost:5173']
+      : true,
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+
+  // Add more socket event handlers here
+});
 
 // Connect to database
 const connectDB = require('./database');
@@ -70,6 +97,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`WebSocket server is running on ws://localhost:${PORT}`);
 });

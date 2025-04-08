@@ -7,7 +7,7 @@ import Cart from './pages/Cart'
 import './App.css'
 import './index.css'
 import Admin from './pages/Admin'
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/common/ProtectedRoute';
 import AuthProvider  from "./context/AuthContext";
 import Login from './pages/Login'
 import Register from './pages/Register'

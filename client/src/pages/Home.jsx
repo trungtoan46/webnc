@@ -1,12 +1,12 @@
 import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Banner from '../components/Banner';
-import Slide from '../components/Slide';
-import CustomerBenefits from '../components/customer-benefits';
-import ProductCollection from '../components/ProductCollection';
-import FlashSale from '../components/FlashSale';
-import CouponSection from '../components/CouponSection';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import Banner from '../components/home/Banner';
+import Slide from '../components/home/Slide';
+import CustomerBenefits from '../components/home/customer-benefits';
+import ProductCollection from '../components/products/ProductCollection';
+import FlashSale from '../components/home/FlashSale';
+import CouponSection from '../components/products/CouponSection';
 
 const Home = () => {
   const categories = [

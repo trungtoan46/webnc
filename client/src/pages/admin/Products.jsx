@@ -36,11 +36,29 @@ const Products = () => {
 
   const handleDelete = async (id) => {
     try {
+      // Lấy thông tin sản phẩm trước khi xóa
+      const productResponse = await api.get(`/admin/products/${id}`);
+      const product = productResponse.data;
+
+      // Xóa ảnh từ Cloudinary
+      if (product.thumbnail) {
+        const publicId = product.thumbnail.split('/').pop().split('.')[0];
+        await api.post('/images/remove', { publicId });
+      }
+      
+      if (product.images && product.images.length > 0) {
+        for (const imageUrl of product.images) {
+          const publicId = imageUrl.split('/').pop().split('.')[0];
+          await api.post('/images/remove', { publicId });
+        }
+      }
+
+      // Xóa sản phẩm
       await api.delete(`/admin/products/${id}`);
-      setProducts(products.filter(product => product.id !== id));
+      setProducts(products.filter(product => product._id !== id));
       fetchProducts();
     } catch (error) {
-      setError('Failed to delete product' + error.message);
+      setError('Failed to delete product: ' + error.message);
     }
   };
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from "@iconify/react";
-import Logo from './Logo';
-import Dropdown from './Dropdown';
-import DropDownFullSize from './DropDownFullSize';
-import { AuthContext } from '../context/AuthContext';
+import Logo from '../common/Logo';
+import Dropdown from '../common/Dropdown';
+import DropDownFullSize from '../common/DropDownFullSize';
+import { AuthContext } from '../../context/AuthContext';
 import { useContext } from 'react';
 
 const Nav = () => {

@@ -17,7 +17,8 @@ const AddProduct = ({ onCancel }) => {
     hasOptions: false,
     isDigital: false,
     tags: [],
-    images: []
+    images: [],
+    quantity: 0
   });
 
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -190,13 +191,15 @@ const AddProduct = ({ onCancel }) => {
         description: formData.description.trim(),
         price: Number(formData.price),
         category_id: formData.category,
-        size: sizes.join(','),
-        color: colors.join(','),
+        size: Array.isArray(sizes) ? sizes.join(',') : sizes,
+        color: Array.isArray(colors) ? colors.join(',') : colors,
         quantity: Number(formData.quantity) || 0,
         is_active: true,
         tags: formData.tags.filter(tag => tag.trim()),
         thumbnail: thumbnailUrl,
-        detail_images: detailUrls
+        detail_images: detailUrls,
+        discount: Number(formData.discount) || 0
+
       };
 
       // Gọi API thêm sản phẩm
@@ -209,6 +212,7 @@ const AddProduct = ({ onCancel }) => {
       fetchProducts();  
       
     } catch (error) {
+      toast.dismiss();
       console.error('Lỗi chi tiết:', error.response?.data || error.message);
       toast.error(error.response?.data?.message || error.message || 'Có lỗi xảy ra khi thêm sản phẩm');
     }
@@ -225,7 +229,8 @@ const AddProduct = ({ onCancel }) => {
       hasOptions: false,
       isDigital: false,
       tags: [],
-      images: []
+      images: [],
+      quantity: 0
     });
     setThumbnailFile(null);
     setSelectedFiles([]);
@@ -463,6 +468,17 @@ const AddProduct = ({ onCancel }) => {
                         ))}
                       </div>
                       {/* Kích cỡ sản phẩm */}
+                    </FormControl>
+                    <FormControl>
+                      <input
+                        name="quantity"
+                        type="number"
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        placeholder="Nhập số lượng"
+                        className="text-gray-900 text-center border-2 
+                        border-gray-300 rounded-md w-4/5"
+                      />
                     </FormControl>
                   </div>
 

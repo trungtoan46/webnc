@@ -1,5 +1,5 @@
 import React from "react";
-import "./CouponSection.css";
+import "../styles/CouponSection.css";
 
 const coupons = [
   {
