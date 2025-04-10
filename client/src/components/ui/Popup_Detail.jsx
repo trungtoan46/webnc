@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProductImage from './ProductImage';
 import ProductInfo from './ProductInfo';
 import PromotionBox from './PromotionBox';
+import useClickOutside  from '../../hooks/useClickOutside';
+import api from '../../services/api/api';
 
 const PopupDetail = ({ product, onClose }) => {
   if (!product) return null;
 
+  
+
+
+  const ref = useClickOutside(() => {
+    onClose();
+  });
+
+
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-4xl relative max-h-[570px] overflow-y-auto mb-10">
+      <div 
+      ref={ref}
+      className="bg-white rounded-lg w-full max-w-4xl relative max-h-[570px] overflow-y-auto mb-10">
         {/* Close button */}
         <button
           onClick={onClose}

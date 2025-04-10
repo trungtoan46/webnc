@@ -10,25 +10,25 @@ const ProductImage = ({ product }) => {
         <img
           src={selectedImage}
           alt={product.name}
-          className="w-full h-auto object-cover rounded-lg m-auto shadow-lg transition-transform duration-300"
+          className="w-7/12 h-auto object-cover rounded-lg m-auto shadow-lg transition-transform duration-300"
         />
       </div>
       
       {/* Thumbnail slider */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2 mt">
         {images.map((image, index) => (
           <button
             key={index}
             onClick={() => setSelectedImage(image)}
             className={`aspect-square rounded-lg overflow-hidden border-2 transition-all
               ${selectedImage === image 
-                ? 'border-blue-500 scale-95' 
-                : 'border-gray-200 hover:border-blue-300'}`}
+                ? 'border-gray-700 scale-95' 
+                : 'border-gray-200 hover:border-gray-500'}`}
           >
             <img
               src={image}
               alt={`${product.name} ${index + 1}`}
-              className="w-full h-full object-cover"
+              className="w-3/4 h-full object-cover m-auto"
             />
           </button>
         ))}
