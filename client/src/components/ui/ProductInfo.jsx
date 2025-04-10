@@ -146,6 +146,7 @@ const ProductInfo = ({ product, onColorToggle, onSizeToggle }) => {
 
 
       
+  
     </div>
   );
 };

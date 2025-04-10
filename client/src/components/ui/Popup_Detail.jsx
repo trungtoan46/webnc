@@ -22,6 +22,7 @@ const PopupDetail = ({ product, onClose }) => {
           <div className="md:w-1/2 p-4">
             <ProductInfo product={product} />
             <PromotionBox />
+            
           </div>
         </div>
       </div>
