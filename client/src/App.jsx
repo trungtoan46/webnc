@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import {ThemeProvider, BaseStyles} from '@primer/react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 //Components
 import Home from './pages/Home'
 import ProductDetail from './pages/ProductDetail'
@@ -21,6 +23,7 @@ function App() {
       <BaseStyles>
         <AuthProvider>
           <Router>
+            <ToastContainer position="top-right" autoClose={1000} />
             <Routes>
               {/* Routes with Header and Footer */}
               <Route path="/" element={

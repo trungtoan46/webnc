@@ -74,7 +74,7 @@ const ProductCard = ({ product, onOpenPopup, onAddToCart }) => {
               group/eye relative"
           >
             <i className="fas fa-eye"></i>
-            <span className="absolute -top-5 left-1/2 -translate-x-1/2 bg-black text-white text-[12px] font-semibold
+            <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-black text-white text-[12px] font-semibold
               px-2 py-1 rounded-md opacity-0 group-hover/eye:opacity-100
               transition-all duration-200 ease-in-out whitespace-nowrap z-10">
               Xem chi tiết
