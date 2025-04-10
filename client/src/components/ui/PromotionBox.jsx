@@ -7,7 +7,7 @@ import { addToCart } from '../../services/api/api';
 const PromotionBox = ({ promoCode, product }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  
+  console.log(product);
   const code = promoCode ? promoCode : 'EGAFREESHIP';
   useEffect(() => {
     
@@ -30,14 +30,12 @@ const PromotionBox = ({ promoCode, product }) => {
     }
   
     try {
-      console.log(`Adding product ${product._id} to cart with quantity:`, quantity);
       
       await addToCart({ productId: product._id, quantity });
-  
-      alert('Product added to cart successfully!');
+      toast.success('Đã thêm vào giỏ hàng');
     } catch (err) {
       console.error('Error adding to cart:', err.response?.data || err.message);
-      alert('Failed to add product to cart. Please try again.');
+      toast.error('Failed to add product to cart. Please try again.');
     }
   };
   
@@ -138,6 +136,7 @@ const PromotionBox = ({ promoCode, product }) => {
     closeOnClick
     rtl={false}
     pauseOnFocusLoss
+    draggable
   />
   </div>
   );
