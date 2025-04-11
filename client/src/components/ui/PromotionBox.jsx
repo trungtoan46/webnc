@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import useClickOutside from '../../hooks/useClickOutside';
-import api from '../../services/api/api';
 import { addToCart } from '../../services/api/api';
 
 const PromotionBox = ({ promoCode, product }) => {
@@ -9,20 +7,14 @@ const PromotionBox = ({ promoCode, product }) => {
   const [quantity, setQuantity] = useState(1);
   console.log(product);
   const code = promoCode ? promoCode : 'EGAFREESHIP';
-  useEffect(() => {
-    
-    handleAddToCart();
-  }, []);
+ 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
     setIsCopied(true);
     toast.success('Đã copy mã khuyến mãi');
   };
   const handleAddToCart = async (product, quantity) => {
-    if (!product) {
-      alert('Product information is not available.');
-      return;
-    }
+  
   
     if (quantity < 1) {
       alert('Quantity must be at least 1.');
