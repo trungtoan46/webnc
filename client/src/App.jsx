@@ -18,6 +18,7 @@ import Dashboard from './pages/Dashboard'
 import MainLayout from './layouts/MainLayout'
 import AddProduct from './pages/admin/AddProduct'
 import Products from './pages/Products'
+import Checkout from './pages/Checkout'
 function App() {
   return (
     <ThemeProvider>
@@ -77,6 +78,11 @@ function App() {
                 <Route path="/register" element={
                   <MainLayout showHeader={false} showFooter={false}>
                     <Register />
+                  </MainLayout>
+                } />
+                <Route path="/checkout" element={
+                  <MainLayout showHeader={false} showFooter={false}>
+                    <Checkout />
                   </MainLayout>
                 } />
               </Routes>
