@@ -4,7 +4,8 @@ import { FiUpload } from 'react-icons/fi';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../../services/api/api';
-import { addProduct } from '../../services/api/admin';
+import { addProduct, checkProductByName } from '../../services/api/admin';
+import convertToVietnameseSlug  from '../../hooks/convertToVietnameseSlug';
 
 const EditProduct = ({ onCancel, productId }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -15,6 +16,7 @@ const EditProduct = ({ onCancel, productId }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    name_slug: '',
     category: '',
     price: '',
     discountPrice: '',
@@ -48,6 +50,7 @@ const EditProduct = ({ onCancel, productId }) => {
           setColors(productData.color || []);
           setFormData({
             name: productData.name || '',
+            name_slug: productData.name_slug || '',
             description: productData.description || '',
             category: productData.category_id || '',
             price: productData.price || '',
@@ -212,14 +215,33 @@ const EditProduct = ({ onCancel, productId }) => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log(detailResponse.size);
 
       const thumbnailUrl = thumbnailResponse.data.urls[0];
       const detailUrls = detailResponse.data.urls;
+      
+      // Tạo name_slug
+      const name_slug = convertToVietnameseSlug(formData.name.trim());
+      
+      // Kiểm tra tên sản phẩm đã tồn tại chưa
+      try {
+        const existingProductResponse = await checkProductByName(name_slug);
+        
+        // API trả về null nếu không tìm thấy, hoặc đối tượng sản phẩm nếu tìm thấy
+        if (existingProductResponse && existingProductResponse._id && 
+            existingProductResponse._id !== productId) {
+          toast.dismiss(); // Đóng toast loading
+          toast.error('Tên sản phẩm đã tồn tại, vui lòng chọn tên khác');
+          return; // Dừng xử lý
+        }
+      } catch (error) {
+        console.error('Lỗi khi kiểm tra tên sản phẩm:', error);
+        // Không return ở đây, tiếp tục với quá trình cập nhật
+      }
 
       // Chuẩn bị dữ liệu sản phẩm
       const productData = {
         name: formData.name.trim(),
+        name_slug: name_slug,
         description: formData.description.trim(),
         price: Number(formData.price),
         category_id: formData.category,
@@ -231,15 +253,14 @@ const EditProduct = ({ onCancel, productId }) => {
         thumbnail: thumbnailUrl,
         detail_images: detailUrls
       };
+      console.log(productData);
 
-      // Gọi API thêm sản phẩm
-      await addProduct(productData);
+      // Gọi API 
+      await api.put(`/admin/products/${productId}`, productData);
       
       // Hiển thị thông báo thành công
       toast.dismiss();
       toast.success('Cập nhật sản phẩm thành công!');
-      clearInfo();
-      onCancel();
     } catch (error) {
       toast.dismiss();
       console.error('Lỗi chi tiết:', error.response?.data || error.message);
@@ -251,6 +272,7 @@ const EditProduct = ({ onCancel, productId }) => {
     setFormData({
       name: '',
       description: '',
+      name_slug: '',
       category: '',
       price: '',
       discountPrice: '',

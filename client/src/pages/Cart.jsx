@@ -1,78 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api/api';
 import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowRight } from 'react-icons/fi';
+import { useCart } from '../context/CartContext';
+import { toast } from 'react-toastify';
 
 const Cart = () => {
-    const [cartItems, setCartItems] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { cart, removeFromCart, updateQuantity, getCartTotal } = useCart();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchCartItems = async () => {
-            try {
-                const response = await api.get('/cart');
-                const items = response.data;
-
-                const detailedItems = await Promise.all(items.map(async (item) => {
-                    const productResponse = await api.get(`/products/${item.productId}`);
-                    return { ...item, product: productResponse.data };
-                }));
-
-                setCartItems(detailedItems);
-            } catch (error) {
-                console.error('Error fetching cart items:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCartItems();
-    }, []);
-
-    const calculateTotalPrice = () => {
-        return cartItems.reduce((total, item) => total + (item.product?.price || 0) * item.quantity, 0);
+    const handleRemoveItem = (productId, selectedSize, selectedColor) => {
+        removeFromCart(productId, selectedSize, selectedColor);
+        toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
     };
 
-    const handleRemoveItem = async (itemId) => {
-        try {
-            await api.delete(`/cart/${itemId}`);
-            setCartItems(cartItems.filter(item => item._id !== itemId));
-        } catch (error) {
-            console.error('Error removing item from cart:', error);
-        }
-    };
-
-    const handleUpdateQuantity = async (itemId, quantity) => {
-        if (quantity < 1) return;
-        try {
-            await api.put(`/cart/${itemId}`, { quantity });
-            setCartItems(cartItems.map(item => 
-                item._id === itemId ? { ...item, quantity } : item
-            ));
-        } catch (error) {
-            console.error('Error updating quantity:', error);
-        }
+    const handleUpdateQuantity = (productId, selectedSize, selectedColor, newQuantity) => {
+        if (newQuantity < 1) return;
+        updateQuantity(productId, selectedSize, selectedColor, newQuantity);
     };  
 
-    const handleCheckout = async () => {
-        try {
-            await api.post('/checkout');
-            navigate('/checkout');
-        } catch (error) {
-            console.error('Error checking out:', error);
-        }
+    const handleCheckout = () => {
+        // Chuyển đến trang thanh toán
+        navigate('/checkout');
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
-    }
-
-    if (cartItems.length === 0) {
+    if (cart.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 pt-20">
                 <div className="container mx-auto px-4">
@@ -105,29 +56,37 @@ const Cart = () => {
                     <div className="lg:w-2/3">
                         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                             <div className="p-6">
-                                {cartItems.map((item, index) => (
+                                {cart.map((item, index) => (
                                     <div 
-                                        key={item._id} 
+                                        key={`${item._id}-${item.selectedSize}-${item.selectedColor}`} 
                                         className={`flex flex-col sm:flex-row items-center gap-6 py-6 
-                                            ${index !== cartItems.length - 1 ? 'border-b border-gray-100' : ''}`}
+                                            ${index !== cart.length - 1 ? 'border-b border-gray-100' : ''}`}
                                     >
                                         {/* Ảnh sản phẩm */}
                                         <div className="w-32 h-32 flex-shrink-0 group">
                                             <img 
-                                                src={item.product?.thumbnail || 'https://placehold.co/300x200'} 
-                                                alt={item.product?.name} 
+                                                src={item.thumbnail || 'https://placehold.co/300x200'} 
+                                                alt={item.name} 
                                                 className="w-full h-full object-cover rounded-lg transition-transform group-hover:scale-105"
                                             />
                                         </div>
 
                                         {/* Thông tin sản phẩm */}
                                         <div className="flex-grow text-center sm:text-left">
-                                            <h3 className="text-lg font-semibold text-gray-800 mb-2">{item.product?.name}</h3>
+                                            <h3 className="text-lg font-semibold text-gray-800 mb-2">{item.name}</h3>
+                                            <div className="mb-2">
+                                                <span className="inline-block text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded mr-2 mb-1">
+                                                    Size: {item.selectedSize}
+                                                </span>
+                                                <span className="inline-block text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded mb-1">
+                                                    Màu: {item.selectedColor}
+                                                </span>
+                                            </div>
                                             <p className="text-blue-600 font-medium mb-2">
-                                                {item.product?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                                {item.price.toLocaleString('vi-VN')}₫
                                             </p>
                                             <p className="text-sm text-gray-500">
-                                                Thành tiền: {(item.product?.price * item.quantity).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                                Thành tiền: {(item.price * item.quantity).toLocaleString('vi-VN')}₫
                                             </p>
                                         </div>
 
@@ -135,7 +94,7 @@ const Cart = () => {
                                         <div className="flex flex-col sm:flex-row items-center gap-4">
                                             <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
                                                 <button 
-                                                    onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}
+                                                    onClick={() => handleUpdateQuantity(item._id, item.selectedSize, item.selectedColor, item.quantity - 1)}
                                                     className="p-2 hover:bg-gray-100 transition-colors rounded-l-lg"
                                                 >
                                                     <FiMinus className="w-4 h-4 text-gray-600" />
@@ -146,20 +105,20 @@ const Cart = () => {
                                                     onChange={(e) => {
                                                         const value = parseInt(e.target.value);
                                                         if (!isNaN(value) && value > 0) {
-                                                            handleUpdateQuantity(item._id, value);
+                                                            handleUpdateQuantity(item._id, item.selectedSize, item.selectedColor, value);
                                                         }
                                                     }}
                                                     className="w-14 text-center bg-white border-x border-gray-200 py-2 focus:outline-none text-gray-700"
                                                 />
                                                 <button 
-                                                    onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}
+                                                    onClick={() => handleUpdateQuantity(item._id, item.selectedSize, item.selectedColor, item.quantity + 1)}
                                                     className="p-2 hover:bg-gray-100 transition-colors rounded-r-lg"
                                                 >
                                                     <FiPlus className="w-4 h-4 text-gray-600" />
                                                 </button>
                                             </div>
                                             <button 
-                                                onClick={() => handleRemoveItem(item._id)}
+                                                onClick={() => handleRemoveItem(item._id, item.selectedSize, item.selectedColor)}
                                                 className="text-red-500 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-full"
                                             >
                                                 <FiTrash2 className="w-5 h-5" />
@@ -179,7 +138,7 @@ const Cart = () => {
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between text-gray-600">
                                     <span>Tạm tính</span>
-                                    <span className="font-medium">{calculateTotalPrice().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                    <span className="font-medium">{getCartTotal().toLocaleString('vi-VN')}₫</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Phí vận chuyển</span>
@@ -188,7 +147,7 @@ const Cart = () => {
                                 <div className="border-t border-dashed pt-4">
                                     <div className="flex justify-between items-center">
                                         <span className="text-lg font-semibold text-gray-800">Tổng cộng</span>
-                                        <span className="text-xl font-bold text-blue-600">{calculateTotalPrice().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                        <span className="text-xl font-bold text-blue-600">{getCartTotal().toLocaleString('vi-VN')}₫</span>
                                     </div>
                                 </div>
                             </div>

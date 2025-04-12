@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { addToCart } from '../../services/api/api';
 
-const PromotionBox = ({ promoCode, product }) => {
+const PromotionBox = ({ promoCode, product, isCart }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  console.log(product);
   const code = promoCode ? promoCode : 'EGAFREESHIP';
  
   const handleCopy = () => {
@@ -87,7 +86,7 @@ const PromotionBox = ({ promoCode, product }) => {
         </li>
       </ul>
     </div>
-
+    {isCart && (
     <div className='flex items-center gap-10 mt-4'>
       <div className='w-4/12 flex items-center gap-0 h-full border-2 border-gray-300 rounded-md'>
         <div className='w-full h-10 rounded-md items-center justify-center flex'>
@@ -119,7 +118,9 @@ const PromotionBox = ({ promoCode, product }) => {
       className='bg-blue-600 text-white px-4 py-2 rounded-md'>
         Thêm vào giỏ
       </button>
+
     </div>
+    )}
     <ToastContainer 
     position="top-right"
     autoClose={3000}

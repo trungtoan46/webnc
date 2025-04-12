@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Icon } from "@iconify/react";
 import Logo from '../common/Logo';
 import Dropdown from '../common/Dropdown';
@@ -12,7 +12,9 @@ const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isIntroOpen, setIsIntroOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { user } = useContext(AuthContext);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { user, handleLogout } = useContext(AuthContext);
+  const navigate = useNavigate();
   const items = [
     {
       title: { label: "Bộ sưu tập", to: "/collections" },
@@ -69,6 +71,12 @@ const Nav = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const onLogout = () => {
+    handleLogout();
+    setIsProfileMenuOpen(false);
+    navigate('/');
+  };
 
   return (
     <nav
@@ -183,13 +191,68 @@ const Nav = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </Link>
-        <Link to="/profile" className="p-2 hover:text-blue-600 flex items-center">
-        <span className="mr-2 text-sm">{user ? user.username : 'Tài khoản'}</span>
-
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-        </Link>
+        
+        {/* Profile menu with logout option */}
+        <div className="relative">
+          <button 
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className="p-2 hover:text-blue-600 flex items-center"
+          >
+            <span className="mr-2 text-sm">{user ? user.username : 'Tài khoản'}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </button>
+          
+          {isProfileMenuOpen && (
+            <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white z-20 border border-gray-200">
+              <div className="py-1">
+                {user ? (
+                  <>
+                    <Link 
+                      to="/profile" 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      Thông tin tài khoản
+                    </Link>
+                    <Link 
+                      to="/orders" 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      Đơn hàng của tôi
+                    </Link>
+                    <button 
+                      onClick={onLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Đăng xuất
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link 
+                      to="/login" 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      Đăng nhập
+                    </Link>
+                    <Link 
+                      to="/register" 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      Đăng ký
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        
         {user && user.role === 'admin' && (
           <Link to="/admin" className="p-2 hover:text-blue-600">
             <Icon className="h-6 w-6 font-bold" icon="material-symbols-light:admin-panel-settings"/>  

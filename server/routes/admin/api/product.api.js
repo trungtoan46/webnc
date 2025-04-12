@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../../../models/Product.model');
+const authenticateAdmin = require('../../../middleware/authAdmin');
 
+router.use(authenticateAdmin);
 // Get all products
 router.get('/', async (req, res) => {
     try {
@@ -11,7 +13,11 @@ router.get('/', async (req, res) => {
         res.json(products);
     } catch (error) {
         console.error('Error getting products:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 });
 
@@ -24,7 +30,11 @@ router.post('/', async (req, res) => {
         res.status(201).json(product);
     } catch (error) {
         console.error('Error creating product:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 });
 
@@ -85,6 +95,13 @@ router.delete('/:id', async (req, res) => {
             error: error.message 
         });
     }
+});
+
+// Check product by name
+router.get('/check-name/:name_slug', async (req, res) => {
+    const { name_slug } = req.params;
+    const product = await Product.findOne({ name_slug });
+    res.json(product);
 });
 
 module.exports = router; 

@@ -24,7 +24,9 @@ const Products = () => {
   
   const fetchProducts = async () => {
     try {
-      const response = await api.get('/admin/products');
+      const response = await api.get('/admin/products', {
+        
+      });
       setProducts(response.data);
     } catch (error) {
       setError('Failed to fetch products' + error.message);
@@ -42,14 +44,24 @@ const Products = () => {
 
       // Xóa ảnh từ Cloudinary
       if (product.thumbnail) {
-        const publicId = product.thumbnail.split('/').pop().split('.')[0];
-        await api.post('/images/remove', { publicId });
+        try {
+          const publicId = getPublicIdFromUrl(product.thumbnail);
+          console.log('Xóa thumbnail:', publicId);
+          await api.post('/images/remove', { public_id: publicId });
+        } catch (error) {
+          console.error('Lỗi khi xóa thumbnail:', error);
+        }
       }
       
       if (product.images && product.images.length > 0) {
         for (const imageUrl of product.images) {
-          const publicId = imageUrl.split('/').pop().split('.')[0];
-          await api.post('/images/remove', { publicId });
+          try {
+            const publicId = getPublicIdFromUrl(imageUrl);
+            console.log('Xóa hình ảnh:', publicId);
+            await api.post('/images/remove', { public_id: publicId });
+          } catch (error) {
+            console.error('Lỗi khi xóa hình ảnh:', error);
+          }
         }
       }
 
@@ -59,6 +71,20 @@ const Products = () => {
       fetchProducts();
     } catch (error) {
       setError('Failed to delete product: ' + error.message);
+    }
+  };
+
+  // Hàm trích xuất public_id từ URL Cloudinary
+  const getPublicIdFromUrl = (url) => {
+    try {
+      // URL có dạng: https://res.cloudinary.com/your-cloud-name/image/upload/v1234567890/folder/filename.jpg
+      const parts = url.split('/');
+      const filename = parts[parts.length - 1];
+      const folderAndFilename = parts[parts.length - 2] + '/' + filename.split('.')[0];
+      return folderAndFilename;
+    } catch (error) {
+      console.error('Lỗi khi trích xuất public_id:', error);
+      return null;
     }
   };
 

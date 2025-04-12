@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 const ProductImage = ({ product }) => {
+  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(product.thumbnail);
   const images = [product.thumbnail, ...(product.images || [])];
 

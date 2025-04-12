@@ -34,6 +34,11 @@ export const getCategories = async () => {
     return response.data;
 };
 
+export const checkProductByName = async (name_slug) => {
+    const response = await api.get(`/admin/products/check-name/${name_slug}`);
+    return response.data;
+};
+
 
 
 

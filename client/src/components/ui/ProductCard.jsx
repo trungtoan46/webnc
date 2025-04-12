@@ -2,9 +2,11 @@ import React from 'react';
 import { animate } from 'animejs';
 import { Link } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useNavigate } from 'react-router-dom';
 
 
 const ProductCard = ({ product, onOpenPopup, onAddToCart }) => {
+  const navigate = useNavigate();
   const triggerAnimation = () => {
     animate('.animate-slide-up', {
       y: {
@@ -40,9 +42,11 @@ const ProductCard = ({ product, onOpenPopup, onAddToCart }) => {
         onMouseLeave={resetAnimation}
       >
         <img
+          onClick={() => navigate(`/product/${product.name_slug}`, { state: { productId: product._id } })}
           src={product.thumbnail}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full cursor-pointer
+           h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {/* Overlay with icons */}
         <div className="absolute -bottom-32 left-0 right-0 bg-opacity-20

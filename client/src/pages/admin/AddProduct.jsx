@@ -5,11 +5,13 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../../services/api/api';
 import { addProduct } from '../../services/api/admin';
+import convertToVietnameseSlug  from '../../hooks/convertToVietnameseSlug';
 
 const AddProduct = ({ onCancel }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    name_slug: '',
     category: '',
     price: '',
     discountPrice: '',
@@ -188,6 +190,7 @@ const AddProduct = ({ onCancel }) => {
       // Chuẩn bị dữ liệu sản phẩm
       const productData = {
         name: formData.name.trim(),
+        name_slug: convertToVietnameseSlug(formData.name.trim()),
         description: formData.description.trim(),
         price: Number(formData.price),
         category_id: formData.category,

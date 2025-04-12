@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Category } = require('../../../models/index.model');
+const authenticateAdmin = require('../../../middleware/authAdmin');
 
+router.use(authenticateAdmin);
+  
 // Get all categories for admin
 router.get('/', async (req, res) => {
   try {

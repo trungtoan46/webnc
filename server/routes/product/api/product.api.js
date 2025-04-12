@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { Product } = require('../../../models/index.model');
+const auth = require('../../../middleware/auth');
+
 
 // Get all products
 router.get('/', async (req, res) => {
@@ -37,4 +39,20 @@ router.get('/category/:categoryId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+router.get('/name/:name_slug', async (req, res) => {
+  try {
+    const product = await Product.findOne({ name_slug: req.params.name_slug }).exec();
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product by name:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 module.exports = router;
