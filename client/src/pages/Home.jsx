@@ -7,6 +7,7 @@ import CustomerBenefits from '../components/home/customer-benefits';
 import ProductCollection from '../components/products/ProductCollection';
 import FlashSale from '../components/home/FlashSale';
 import CouponSection from '../components/products/CouponSection';
+import Voucher from '../components/common/Voucher';
 
 const Home = () => {
   const categories = [
@@ -61,6 +62,7 @@ const Home = () => {
 
     return (
         <div className='w-full'>
+            <Voucher />
             <Slide />
             <CustomerBenefits benefits={benefitsData} />
             <FlashSale />

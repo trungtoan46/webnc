@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
-const MainLayout = ({ children, showHeader = true, showFooter = true }) => {
+const MainLayout = ({ children, showHeader = true, showFooter = true, showBanner = true }) => {
   return (
     <div className="flex flex-col min-h-screen w-full">
       {showHeader && <Header />}
@@ -14,4 +14,4 @@ const MainLayout = ({ children, showHeader = true, showFooter = true }) => {
   );
 };
 
-export default MainLayout; 
+export default MainLayout;

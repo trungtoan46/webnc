@@ -3,14 +3,14 @@ import Banner from '../home/Banner';
 import Nav from './Nav';
 import bannerImage from '../../assets/banner.webp';
 
-const Header = ({ theme = 'light' }) => {
+const Header = ({ theme = 'light', showBanner = false }) => {
  
 
   return (
     <header className={`rounded-lg ${theme === 'dark' ? 
     'bg-gray-800 text-white' : 'bg-white text-black'}`}>
       <Nav /> {/* Use the Nav component */}
-      <Banner img={bannerImage} />
+      {showBanner && <Banner img={bannerImage} />}
     </header>
   );
 };
