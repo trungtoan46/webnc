@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 
-const ProductInfo = ({ product, onColorToggle, onSizeToggle }) => {
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
+const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onColorChange }) => {
+  
   const formatPrice = (price) => {
     return price.toLocaleString() + 'đ';
   };
@@ -17,21 +16,15 @@ const ProductInfo = ({ product, onColorToggle, onSizeToggle }) => {
     'Yellow': 'Vàng',
   }
 
-  const handleSizeClick = (size) => {
-    const newSize = selectedSize === size ? null : size;
-    setSelectedSize(newSize);
-    if (onSizeToggle) {
-      onSizeToggle(newSize);
-    }
+  const handleSizeChange = (size) => {
+    onSizeChange(size);
   };
 
-  const handleColorClick = (color) => {
-    const newColor = selectedColor === color ? null : color;
-    setSelectedColor(newColor);
-    if (onColorToggle) {
-      onColorToggle(newColor);
-    }
-  };
+  const handleColorChange = (color) => {
+    onColorChange(color);
+  };  
+
+ 
 
   // Đảm bảo luôn có một mảng để map
   const colors = Array.isArray(product.color)
@@ -83,7 +76,8 @@ const ProductInfo = ({ product, onColorToggle, onSizeToggle }) => {
                   <button
                 key={index}
                 type="button"
-                onClick={() => handleSizeClick(size)}
+                value={size}
+                onClick={() => handleSizeChange(size)}
                 className={`appearance-none outline-none ring-0 focus:outline-none w-8 h-8
                   border-2 p-1 rounded-md text-gray-700 text-center text-sm
                   ${selectedSize === size ? 'border-black' : 'border-gray-500 cursor-pointer'}`}
@@ -119,7 +113,8 @@ const ProductInfo = ({ product, onColorToggle, onSizeToggle }) => {
               <div key={index} className="relative group">
                 <button
                   type="button"
-                  onClick={() => handleColorClick(color)}
+                  value={color}
+                  onClick={() => handleColorChange(color)} 
                   className={`w-8 h-8 rounded-full transition-all border-2 duration-200
                     border-gray-700
                     ${selectedColor === color ? 'border-[3px] border-blue-500 scale-110' : ''}

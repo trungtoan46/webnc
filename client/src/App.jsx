@@ -30,12 +30,12 @@ function App() {
               <Routes>
                 {/* Routes with Header and Footer */}
                 <Route path="/" element={
-                  <MainLayout>
+                  <MainLayout showBanner={true}>
                     <Home />
                   </MainLayout>
                 } />
                 <Route path="/products" element={
-                  <MainLayout>
+                  <MainLayout showBanner={true}>
                     <Products />
                   </MainLayout>
                 } />

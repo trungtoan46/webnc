@@ -83,7 +83,7 @@ const Cart = () => {
                                                 </span>
                                             </div>
                                             <p className="text-blue-600 font-medium mb-2">
-                                                {item.price.toLocaleString('vi-VN')}₫
+                                            {item.price?.toLocaleString() || '0'}
                                             </p>
                                             <p className="text-sm text-gray-500">
                                                 Thành tiền: {(item.price * item.quantity).toLocaleString('vi-VN')}₫

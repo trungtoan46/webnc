@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import ProductImage from './ProductImage';
 import ProductInfo from './ProductInfo';
 import PromotionBox from './PromotionBox';
@@ -6,16 +6,15 @@ import useClickOutside  from '../../hooks/useClickOutside';
 import api from '../../services/api/api';
 
 const PopupDetail = ({ product, onClose }) => {
-  if (!product) return null;
-
-  
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
 
 
   const ref = useClickOutside(() => {
     onClose();
   });
 
-
+  if (!product) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -33,9 +32,19 @@ const PopupDetail = ({ product, onClose }) => {
         <div className="flex flex-col md:flex-row">
           <ProductImage product={product} />
           <div className="md:w-1/2 p-4">
-            <ProductInfo product={product} />
-            <PromotionBox product={product} />
-            
+            <ProductInfo 
+              product={product} 
+              onColorChange={setSelectedColor}
+              onSizeChange={setSelectedSize}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+            />
+            <PromotionBox 
+              product={product} 
+              isCart={true}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+            />
           </div>
         </div>
       </div>
