@@ -17,15 +17,46 @@ const Products = () => {
     colors: [],
     sizes: []
   });
+  const [categories, setCategories] = useState([]);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    limit: 12
+  });
 
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
-  }, []);
+  }, [pagination.currentPage, filters]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get('/products');
-      setProducts(response.data);
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: pagination.currentPage,
+        limit: pagination.limit,
+        ...(filters.category && { category: filters.category }),
+        ...(filters.priceRange && { priceRange: filters.priceRange }),
+        ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
+        ...(filters.sizes.length > 0 && { sizes: filters.sizes.join(',') })
+      });
+
+      const response = await api.get(`/products?${queryParams}`);
+      setProducts(response.data.products);
+      console.log("response.data.products:", response.data.products);
+      setPagination(prev => ({
+        ...prev,
+        totalPages: Math.ceil(response.data.total / pagination.limit)
+      }));
       setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -39,6 +70,7 @@ const Products = () => {
       ...prev,
       [name]: value
     }));
+    setPagination(prev => ({ ...prev, currentPage: 1 })); 
   };
 
   const handleColorToggle = (color) => {
@@ -48,6 +80,7 @@ const Products = () => {
         ? prev.colors.filter(c => c !== color)
         : [...prev.colors, color]
     }));
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
 
   const handleSizeToggle = (size) => {
@@ -56,6 +89,14 @@ const Products = () => {
       sizes: prev.sizes.includes(size)
         ? prev.sizes.filter(s => s !== size)
         : [...prev.sizes, size]
+    }));
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({
+      ...prev,
+      currentPage: newPage
     }));
   };
 
@@ -91,6 +132,7 @@ const Products = () => {
       alert('Failed to add product to cart. Please try again.');
     }
   };
+  console.log("products:", products); 
 
   return (
     <div className="min-h-screen bg-gray-50 products-container">
@@ -98,16 +140,107 @@ const Products = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           <FilterSidebar
             filters={filters}
+            categories={categories}
             onFilterChange={handleFilterChange}
             onColorToggle={handleColorToggle}
             onSizeToggle={handleSizeToggle}
           />
-          <ProductGrid
-            products={products}
-            loading={loading}
-            onOpenPopup={handleOpenPopup}
-            onAddToCart={handleAddToCart}
-          />
+          <div className="flex-1">
+            <ProductGrid
+              products={products}
+              loading={loading}
+              onOpenPopup={handleOpenPopup}
+              onAddToCart={handleAddToCart}
+            />
+            
+            {/* Pagination */}
+            <div className="mt-8 flex justify-center">
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={pagination.currentPage === 1}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                    pagination.currentPage === 1
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  Previous
+                </button>
+                
+                {(() => {
+                  const totalPages = Math.max(1, Math.min(pagination.totalPages || 1, 100)); // Ensure valid range
+                  const currentPage = pagination.currentPage;
+                  const delta = 2; // Number of pages to show before and after current page
+                  
+                  let pages = [];
+                  let leftBound = Math.max(1, currentPage - delta);
+                  let rightBound = Math.min(totalPages, currentPage + delta);
+
+                  // Adjust bounds to always show 5 pages when possible
+                  if (rightBound - leftBound < 4) {
+                    if (leftBound === 1) {
+                      rightBound = Math.min(5, totalPages);
+                    } else if (rightBound === totalPages) {
+                      leftBound = Math.max(1, totalPages - 4);
+                    }
+                  }
+
+                  // Add first page if needed
+                  if (leftBound > 1) {
+                    pages.push(1);
+                    if (leftBound > 2) pages.push('...');
+                  }
+
+                  // Add pages in range
+                  for (let i = leftBound; i <= rightBound; i++) {
+                    pages.push(i);
+                  }
+
+                  // Add last page if needed
+                  if (rightBound < totalPages) {
+                    if (rightBound < totalPages - 1) pages.push('...');
+                    pages.push(totalPages);
+                  }
+
+                  return pages.map((page, index) => 
+                    page === '...' ? (
+                      <span
+                        key={`ellipsis-${index}`}
+                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-700"
+                      >
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === page
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  );
+                })()}
+                
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={pagination.currentPage === pagination.totalPages}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                    pagination.currentPage === pagination.totalPages
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  Next
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
       </div>
       {showPopup && (

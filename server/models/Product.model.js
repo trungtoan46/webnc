@@ -46,17 +46,10 @@ const ProductSchema = new mongoose.Schema({
         required: true,
         default: 'https://placehold.co/600x400/EEE/31343C',
     },
-    size: {
-        type: String,
-        required: true,
-    },
-    color: {
-        type: String,
-        required: true,
-    },
+
     tags: {
         type: Array,
-        required: true,
+        required: false,
     },
     sale_price: {
         type: Number,

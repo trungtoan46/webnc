@@ -2,16 +2,18 @@ import React from 'react';
 import { FormControl, TextInput, Textarea } from '@primer/react';
 import { FiUpload } from 'react-icons/fi';
 
+
+const prices = [
+  { value: 100000, label: '100.000 VNĐ' },
+  { value: 200000, label: '200.000 VNĐ' },
+  { value: 300000, label: '300.000 VNĐ' }
+
+]
+
 const ProductForm = ({ 
   formData, 
   handleChange, 
-  handleThumbnailChange, 
-  handleDetailImagesChange,
-  thumbnailFile,
-  selectedFiles,
-  handleImageDelete,
-  prices,
-  handlePriceChange
+  handlePriceChange,
 }) => {
   return (
     <div className="space-y-6">
@@ -61,78 +63,8 @@ const ProductForm = ({
         </FormControl>
       </section>
 
-      <section>
-        <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">
-          Hình Ảnh Đại Diện
-        </h3>
-        <label className="border-2 border-dashed rounded-lg p-8 
-          text-center bg-gray-50 cursor-pointer w-full h-36
-          flex flex-col items-center justify-center">
-          <FiUpload className="mx-auto h-12 w-12 text-blue-400" />
-          <div className="mt-2">
-            <p className="text-blue-600 font-medium">Thêm Tệp</p>
-            <p className="text-sm text-gray-500">Hoặc kéo và thả tệp</p>
-          </div>
-          <input
-            type="file"
-            className="hidden"
-            onChange={handleThumbnailChange}
-          />
-        </label>
-        {thumbnailFile && (
-          <div className="mt-4 relative group w-24 h-24">
-            <img 
-              src={URL.createObjectURL(thumbnailFile)} 
-              alt="Ảnh đại diện" 
-              className="w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150"
-            />
-            <button 
-              onClick={() => setThumbnailFile(null)}
-              className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-      </section>
+  
 
-      <section>
-        <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">
-          Hình Ảnh Chi Tiết
-        </h3>
-        <label className="border-2 border-dashed rounded-lg p-8 
-          text-center bg-gray-50 cursor-pointer w-full h-36
-          flex flex-col items-center justify-center">
-          <FiUpload className="mx-auto h-12 w-12 text-blue-400" />
-          <div className="mt-2">
-            <p className="text-blue-600 font-medium">Thêm Tệp</p>
-            <p className="text-sm text-gray-500">Hoặc kéo và thả tệp</p>
-          </div>
-          <input
-            type="file"
-            multiple
-            className="hidden"
-            onChange={handleDetailImagesChange}
-          />
-        </label>
-        <div className="mt-4 flex gap-10 flex-wrap">
-          {selectedFiles.map((file, index) => (
-            <div key={index} className="relative group">
-              <img 
-                src={URL.createObjectURL(file)} 
-                alt={`Ảnh ${index + 1}`} 
-                className="w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150"
-              />
-              <button 
-                onClick={() => handleImageDelete(index)}
-                className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
 
       <section>
         <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">Giá</h3>

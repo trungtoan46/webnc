@@ -54,22 +54,65 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update product
+// Update product
 router.put('/:id', async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
-        );
-        if (!product) {
+        const existingProduct = await Product.findById(req.params.id);
+        if (!existingProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        res.json(product);
+
+        const {
+            name,
+            price,
+            description,
+            thumbnail,
+            size,
+            color,
+            tags,
+            sale_price,
+            category_id,
+            is_active,
+            detail_images,
+            product_id,
+            name_slug,
+            variants,
+        } = req.body;
+
+        // Gán thủ công các field
+        existingProduct.name = name;
+        existingProduct.price = price;
+        existingProduct.description = description;
+        existingProduct.thumbnail = thumbnail;
+        existingProduct.size = size;
+        existingProduct.color = color;
+        existingProduct.tags = tags;
+        existingProduct.sale_price = sale_price;
+        existingProduct.category_id = category_id;
+        existingProduct.is_active = is_active;
+        existingProduct.detail_images = detail_images;
+        existingProduct.product_id = product_id;
+        existingProduct.name_slug = name_slug;
+
+        if (Array.isArray(variants)) {
+            existingProduct.variants = variants;
+            // Tính lại tổng tồn kho
+            existingProduct.quantity = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+        }
+
+        const updated = await existingProduct.save();
+
+        res.json(updated);
     } catch (error) {
-        console.error('Error updating product:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Error updating product:', error.message);
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 });
+
 
 // Delete product
 router.delete('/:id', async (req, res) => {

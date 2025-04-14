@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ProductGrid = ({ products, loading, onOpenPopup, onAddToCart }) => {
   const navigate = useNavigate();
+  console.log("products:", products);
   return (
     <div className="lg:w-3/4">
       {/* View Mode Toggle */}
