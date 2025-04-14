@@ -3,9 +3,11 @@ import { FormControl, TextInput, Select, Textarea } from '@primer/react';
 import { FiUpload } from 'react-icons/fi';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api/api';
 import { addProduct, checkProductByName } from '../../services/api/admin';
 import convertToVietnameseSlug  from '../../hooks/convertToVietnameseSlug';
+import AnimedNumber from '../../components/common/AnimedNumber';
 
 const EditProduct = ({ onCancel, productId }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -13,6 +15,9 @@ const EditProduct = ({ onCancel, productId }) => {
   const [sizes, setSizes] = useState([]);
   const [colors, setColors] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [quantity, setQuantity] = useState(0);
+  const [variants, setVariants] = useState([]);
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -27,8 +32,11 @@ const EditProduct = ({ onCancel, productId }) => {
     images: [],
     quantity: 0,
     sizes: [],
-    color: []
+    color: [],
+    variants: []
   });
+
+
   
   useEffect(() => {
     const fetchCategories = async () => {
@@ -46,8 +54,12 @@ const EditProduct = ({ onCancel, productId }) => {
           const thumbnailFile = await urlToFile(productData.thumbnail || null);
           setThumbnailFile(thumbnailFile);
           setSelectedFiles(detailImageFiles || []);
-          setSizes(productData.size || []);
-          setColors(productData.color || []);
+          setSizes([...new Set(productData.variants.map(variant => variant.size))]);
+          setColors([...new Set(productData.variants.map(variant => variant.color))]);
+          console.log('Variants:', productData.variants);
+          console.log('Sizes:', productData.variants.map(variant => variant.size));
+          console.log('Colors:', productData.variants.map(variant => variant.color));
+          setQuantity(productData.variants.reduce((total, variant) => total + variant.quantity, 0));
           setFormData({
             name: productData.name || '',
             name_slug: productData.name_slug || '',
@@ -57,7 +69,8 @@ const EditProduct = ({ onCancel, productId }) => {
             tags: Array.isArray(productData.tags) ? productData.tags : [],   
             images: detailImageFiles,
             thumbnail: thumbnailFile,
-            quantity: productData.quantity || 0
+            variants: productData.variants || []
+
           });
         } catch (error) {
           console.error('Lỗi khi tải sản phẩm:', error);
@@ -67,6 +80,17 @@ const EditProduct = ({ onCancel, productId }) => {
       fetchProductById();
     }
   }, [productId]);
+
+  useEffect(() => {
+    if (variants.length === 0) {
+      setVariants(sizes.map(size => ({
+        size,
+        color: colors[0] || '',
+        quantity: 0
+      })));
+    }
+  }, [sizes, colors]);
+
 
   const urlToFile = async (url) => {
     try {
@@ -559,33 +583,29 @@ const EditProduct = ({ onCancel, productId }) => {
                           </button>
                         ))}
                       </div>
-                      {/* Kích cỡ sản phẩm */}
+                      {/* Số lượng sản phẩm */} 
                     </FormControl>
-                    <FormControl>
+                    <FormControl sx={{
+                      width: "80%"
+                      
+                    }}>
                       <FormControl.Label
                       sx={{
                         color: "#2563eb",
                         marginBottom: "10px"
+                      
                       }}
-                      >Số Lượng</FormControl.Label>
-                      <TextInput
-                        name="quantity"
-                        type="number"
-                        value={formData.quantity}
-                        onChange={handleChange}
-                        placeholder="Nhập số lượng"
-                        sx={
-                          {
-                            "& input":{
-                                color: "#1F2937",
-                                textAlign: "center",
-                                border: "2px solid #d1d5db",
-                                borderRadius: "8px",
-                            },
-                            width: "80%"
-                          }
-                        }
+                      >Số Lượng
+                      </FormControl.Label>
+                      <div className="flex justify-center border-2 border-gray-300 rounded-md w-1/2 h-1/2 text-sm">
+                        <AnimedNumber
+                          value={quantity}
+                          onChange={setQuantity}
+                          max={999}
+                          min={0}
+                        border={true}
                       />
+                      </div>
                     </FormControl>
                   </div>
 

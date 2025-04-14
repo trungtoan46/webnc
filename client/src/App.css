@@ -15,6 +15,12 @@
 input[type="number"] {
     -moz-appearance: textfield;
 }
+
+input:focus {
+  outline: none;
+  border: none;
+}
+
 }
 
 .logo {

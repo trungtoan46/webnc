@@ -14,10 +14,10 @@ const Checkout = () => {
     city: '',
     paymentMethod: 'cod'
   });
-  
+
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  
+
   useEffect(() => {
     // Lấy thông tin giỏ hàng từ localStorage
     const storedCart = localStorage.getItem('cart');
@@ -25,7 +25,7 @@ const Checkout = () => {
       try {
         const cart = JSON.parse(storedCart);
         setCartItems(cart);
-        
+
         // Tính tổng tiền
         const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         setTotalPrice(total);
@@ -35,7 +35,7 @@ const Checkout = () => {
       }
     }
   }, []);
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -43,29 +43,31 @@ const Checkout = () => {
       [name]: value
     }));
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Kiểm tra form
     if (!formData.fullName || !formData.phone || !formData.address) {
       toast.error('Vui lòng điền đầy đủ thông tin giao hàng');
       return;
     }
-    
+
     // Xử lý đặt hàng (ở đây có thể gọi API)
     toast.success('Đặt hàng thành công!');
-    
+
     // Xóa giỏ hàng
     // localStorage.removeItem('cart');
-    
+
     // Chuyển hướng đến trang cảm ơn
     navigate('/order-success');
   };
 
   return (
     <div className='min-h-screen bg-gray-100'>
-      <ToastContainer 
+
+
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -76,20 +78,20 @@ const Checkout = () => {
       />
       <div className='container mx-auto px-4 py-8'>
         <div className='flex items-center justify-start gap-4 mb-8'>
-            <img src={logo} alt="logo" className='w-auto h-20' />
-            <div className='border-l-2 border border-blue-200 h-10'></div>
-            <h1 className='text-2xl font-bold text-gray-600'>Thanh Toán</h1>
+          <img src={logo} alt="logo" className='w-auto h-20' />
+          <div className='border-l-2 border border-blue-200 h-10'></div>
+          <h1 className='text-2xl font-bold text-gray-600'>Thanh Toán</h1>
         </div>
-        
+
         <div className="flex items-center mb-6">
-          <button 
+          <button
             className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors"
             onClick={() => navigate(-1)}
           >
             <FaArrowLeft /> <span>Quay lại</span>
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Thông tin giao hàng */}
           <div className="lg:col-span-2">
@@ -126,7 +128,7 @@ const Checkout = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="mb-4">
                   <label className="block text-gray-700 mb-2 flex items-center">
                     <FaEnvelope className="mr-2 text-gray-500" /> Email
@@ -140,7 +142,7 @@ const Checkout = () => {
                     placeholder="Nhập email của bạn"
                   />
                 </div>
-                
+
                 <div className="mb-4">
                   <label className="block text-gray-700 mb-2 flex items-center">
                     <FaMapMarkerAlt className="mr-2 text-gray-500" /> Địa chỉ
@@ -154,7 +156,7 @@ const Checkout = () => {
                     placeholder="Nhập địa chỉ giao hàng"
                   />
                 </div>
-                
+
                 <div className="mb-4">
                   <label className="block text-left text-gray-700 mb-2">Thành phố/Tỉnh</label>
                   <input
@@ -168,7 +170,7 @@ const Checkout = () => {
                 </div>
               </form>
             </div>
-            
+
             {/* Phương thức thanh toán */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold mb-4 text-gray-700 flex items-center">
@@ -187,7 +189,7 @@ const Checkout = () => {
                   <FaMoneyBill className="text-green-500 mr-2" />
                   <span>Thanh toán khi nhận hàng (COD)</span>
                 </label>
-                
+
                 <label className="flex items-center p-3 border rounded-md cursor-pointer hover:bg-gray-50 text-gray-800">
                   <input
                     type="radio"
@@ -203,12 +205,12 @@ const Checkout = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Tổng kết đơn hàng */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
               <h2 className="text-xl font-semibold mb-4 text-gray-700">Tổng kết đơn hàng</h2>
-              
+
               <div className="max-h-60 overflow-y-auto mb-4">
                 {cartItems.length > 0 ? (
                   cartItems.map((item, index) => (
@@ -231,7 +233,7 @@ const Checkout = () => {
                   <p className="text-gray-600 text-center py-4">Giỏ hàng trống</p>
                 )}
               </div>
-              
+
               <div className="space-y-2 border-t pt-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-700">Tạm tính:</span>
@@ -246,7 +248,7 @@ const Checkout = () => {
                   <span className="text-blue-700">{(totalPrice + 30000).toLocaleString()}₫</span>
                 </div>
               </div>
-              
+
               <button
                 type="submit"
                 onClick={handleSubmit}

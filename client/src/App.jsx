@@ -19,6 +19,7 @@ import MainLayout from './layouts/MainLayout'
 import AddProduct from './pages/admin/AddProduct'
 import Products from './pages/Products'
 import Checkout from './pages/Checkout'
+import Test from './pages/test'
 function App() {
   return (
     <ThemeProvider>
@@ -29,6 +30,11 @@ function App() {
               <ToastContainer position="top-right" autoClose={1000} />
               <Routes>
                 {/* Routes with Header and Footer */}
+                <Route path="/test" element={
+                  <MainLayout showBanner={true}>
+                    <Test />
+                  </MainLayout>
+                } />
                 <Route path="/" element={
                   <MainLayout showBanner={true}>
                     <Home />

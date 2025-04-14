@@ -2,6 +2,22 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 
+const VariantSchema = new mongoose.Schema({
+    size: {
+      type: String,
+      required: true,
+    },
+    color: {
+      type: String,
+      required: true,
+    },
+    stock: {
+      type: Number,
+      required: true,
+      default: 0,
+    }
+  }, { _id: false });
+
 // Product Schema
 const ProductSchema = new mongoose.Schema({
     name: {
@@ -15,7 +31,12 @@ const ProductSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true,
+    },  
+    variants: {
+        type: [VariantSchema],
+        required: true,
     },
+
     description: {
         type: String,
         required: true,

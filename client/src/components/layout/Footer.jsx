@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ProductAnimation from '../common/3d';
 
 const Footer = () => {
   return (
@@ -61,6 +62,7 @@ const Footer = () => {
             </address>
           </div>
         </div>
+
         
         <div className="border-t border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-300">© 2024 Tên Cửa Hàng. Tất cả các quyền được bảo lưu.</p>
@@ -86,6 +88,8 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      <ProductAnimation />
+
     </footer>
   );
 };

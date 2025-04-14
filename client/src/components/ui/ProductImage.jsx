@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 const ProductImage = ({ product }) => {
-  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(product.thumbnail);
   const images = [product.thumbnail, ...(product.images || [])];
 
@@ -11,7 +9,7 @@ const ProductImage = ({ product }) => {
         <img
           src={selectedImage}
           alt={product.name}
-          className="w-7/12 h-auto object-cover rounded-lg m-auto shadow-lg transition-transform duration-300"
+          className="w-10/12 h-auto object-cover rounded-lg m-auto shadow-lg transition-transform duration-300"
         />
       </div>
       

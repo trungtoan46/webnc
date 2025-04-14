@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onColorChange }) => {
   

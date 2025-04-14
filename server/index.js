@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['http://localhost:3001', 'http://localhost:5173']
+      ? ['http://localhost:3003', 'http://localhost:5173']
       : true,
     methods: ['GET', 'POST'],
     credentials: true
@@ -40,7 +40,7 @@ connectDB();
 // CORS configuration - Must be before other middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['http://localhost:3001', 'http://localhost:5173']
+    ? ['http://localhost:3003', 'http://localhost:5173']
     : true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -96,8 +96,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Start server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+const PORT = process.env.PORT || 5000 ;
+server.listen(5000 , () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`WebSocket server is running on ws://localhost:${PORT}`);
 });

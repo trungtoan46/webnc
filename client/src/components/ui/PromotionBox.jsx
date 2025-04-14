@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { useCart } from '../../context/CartContext';
-
+import AnimedNumber from '../common/AnimedNumber';
 const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize }) => {
   const [quantity, setQuantity] = useState(1);
   const code = promoCode ? promoCode : 'EGAFREESHIP';
@@ -96,29 +96,9 @@ const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize 
       </div>
       {isCart && (
         <div className='flex items-center gap-10 mt-4'>
-          <div className='w-4/12 flex items-center gap-0 h-full border-2 border-gray-300 rounded-md'>
+          <div className='w-4/12 flex items-center gap-0 h-full border-2 border-gray-500 rounded-md'>
             <div className='w-full h-10 rounded-md items-center justify-center flex'>
-              <img 
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAGNJREFUWEft1cENgDAMBMFNHxQCfSCaTCGkkBSC+IMfyJJ5bAo4n8aK3Ch+rXg+FlBAAQUUUCASWIAt6VidwHzKigrsQE8qcLxl/brAvYI1SWB8WUHS7DjGb6iAAgoooEC5wAUX/wghZaOPjAAAAABJRU5ErkJggg==" 
-              alt="" 
-              className='w-4 h-4 cursor-pointer' 
-              onClick={() => handleQuantityChange(-1)}
-              />
-            </div>
-            <input 
-              type="number" 
-              className='w-20 text-black text-center h-10 rounded-md p-2 focus:outline-none focus:ring-0' 
-              value={quantity}
-              onChange={handleQuantityChange}
-              min="1"
-            />
-            <div className='w-full h-10 rounded-md items-center justify-center flex'>
-              <img 
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAItJREFUWEdjZBhgwDjA9jOMOmA0BCgJAVEGBgZtaCK+ysDA8JqcBE2JA8IYGBhWQi0FsVePOmA0BEZDgNohgJzPsZntwMDAUA+VaGBgYDiIxwE4ywl85QByPifHc8h6cJYTg9oBAx4FhIJ9tCgeDYHREBjwEBjwJhmhcoIoeUrahERZQEjRqANGQwAAsTYsIdME3f0AAAAASUVORK5CYII=" 
-              alt="" 
-              className='w-4 h-4 cursor-pointer' 
-              onClick={() => handleQuantityChange(1)}
-              />
+            <AnimedNumber value={quantity} onChange={setQuantity} min={0} max={1000000000} />
             </div>
           </div>
           <button 

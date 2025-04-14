@@ -3,7 +3,6 @@ import ProductImage from './ProductImage';
 import ProductInfo from './ProductInfo';
 import PromotionBox from './PromotionBox';
 import useClickOutside  from '../../hooks/useClickOutside';
-import api from '../../services/api/api';
 
 const PopupDetail = ({ product, onClose }) => {
   const [selectedColor, setSelectedColor] = useState(null);
