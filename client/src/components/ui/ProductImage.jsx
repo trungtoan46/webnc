@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 const ProductImage = ({ product }) => {
   const [selectedImage, setSelectedImage] = useState(product.thumbnail);
-  const images = [product.thumbnail, ...(product.images || [])];
+  const [detailImages, setDetailImages] = useState(product.detail_images || []);
+  const images = [product.thumbnail, ...(product.detail_images || [])];
 
   return (
     <div className="md:w-1/2 p-4">
@@ -14,7 +15,7 @@ const ProductImage = ({ product }) => {
       </div>
       
       {/* Thumbnail slider */}
-      <div className="grid grid-cols-4 gap-2 mt">
+      <div className="grid grid-cols-4 gap-2 mt-4">
         {images.map((image, index) => (
           <button
             key={index}

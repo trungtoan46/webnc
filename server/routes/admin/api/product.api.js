@@ -54,13 +54,16 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update product
-// Update product
 router.put('/:id', async (req, res) => {
     try {
         const existingProduct = await Product.findById(req.params.id);
         if (!existingProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
+
+        // Debug log
+        console.log('Update Product - Request Body:', JSON.stringify(req.body, null, 2));
+        console.log('Detail Images in Request:', req.body.detail_images);
 
         const {
             name,
@@ -94,6 +97,9 @@ router.put('/:id', async (req, res) => {
         existingProduct.product_id = product_id;
         existingProduct.name_slug = name_slug;
 
+        // Debug log
+        console.log('Detail Images before save:', existingProduct.detail_images);
+
         if (Array.isArray(variants)) {
             existingProduct.variants = variants;
             // Tính lại tổng tồn kho
@@ -101,6 +107,10 @@ router.put('/:id', async (req, res) => {
         }
 
         const updated = await existingProduct.save();
+
+        // Debug log
+        console.log('Updated Product:', JSON.stringify(updated, null, 2));
+        console.log('Detail Images after save:', updated.detail_images);
 
         res.json(updated);
     } catch (error) {

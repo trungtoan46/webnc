@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiFilter } from 'react-icons/fi';
+import Select from 'react-select';
 
 const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onSizeToggle }) => {
   const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Black', 'White'];
@@ -12,8 +13,41 @@ const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onS
     { value: '200+', label: 'Over $200' }
   ];
 
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      color: state.isSelected ? 'white' : 'black',
+      backgroundColor: state.isSelected ? '#3b82f6' : 'white',
+      padding: '8px 12px',
+      cursor: 'pointer',
+      '&:hover': {
+        backgroundColor: '#e5e7eb',
+      },
+    }),
+    control: (provided) => ({
+      ...provided,
+      borderColor: '#d1d5db',
+      '&:hover': {
+        borderColor: '#3b82f6',
+      },
+    }),
+    menu: (provided) => ({
+      ...provided,
+      borderRadius: '6px',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    }),
+  };
+
+  const categoryOptions = [
+    { value: '', label: 'All Categories' },
+    ...categories.map(category => ({
+      value: category._id,
+      label: category.name
+    }))
+  ];
+
   return (
-    <div className="w-64 bg-white p-4 rounded-lg shadow">
+    <div className="w-full bg-white p-4 rounded-lg shadow">
       <h2 className="text-lg font-semibold mb-4 flex items-center text-gray-700">
         <FiFilter className="mr-2" />
         Filters
@@ -22,36 +56,27 @@ const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onS
       {/* Category Filter */}
       <div className="mb-6">
         <h3 className="text-sm font-medium text-gray-900 mb-2">Categories</h3>
-        <select
-          name="category"
-          value={filters.category}
-          onChange={onFilterChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-        >
-          <option value="">All Categories</option>
-          {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+        <Select
+          options={categoryOptions}
+          value={categoryOptions.find(option => option.value === filters.category)}
+          onChange={(selectedOption) => onFilterChange({ target: { name: 'category', value: selectedOption.value } })}
+          styles={customStyles}
+          className="react-select-container"
+          classNamePrefix="react-select"
+        />
       </div>
 
       {/* Price Range Filter */}
       <div className="mb-6">
         <h3 className="text-sm font-medium text-gray-900 mb-2">Price Range</h3>
-        <select
-          name="priceRange"
-          value={filters.priceRange}
-          onChange={onFilterChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-        >
-          {priceRanges.map((range) => (
-            <option key={range.value} value={range.value}>
-              {range.label}
-            </option>
-          ))}
-        </select>
+        <Select
+          options={priceRanges}
+          value={priceRanges.find(range => range.value === filters.priceRange)}
+          onChange={(selectedOption) => onFilterChange({ target: { name: 'priceRange', value: selectedOption.value } })}
+          styles={customStyles}
+          className="react-select-container"
+          classNamePrefix="react-select"
+        />
       </div>
 
       {/* Color Filter */}

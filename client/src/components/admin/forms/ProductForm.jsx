@@ -14,6 +14,12 @@ const ProductForm = ({
   formData, 
   handleChange, 
   handlePriceChange,
+  categories = [],
+  handleThumbnailChange,
+  handleDetailImagesChange,
+  thumbnailFile,
+  selectedFiles,
+  handleImageDelete,
 }) => {
   return (
     <div className="space-y-6">
@@ -61,10 +67,26 @@ const ProductForm = ({
             }}
           />
         </FormControl>
+
+        <FormControl>
+          <FormControl.Label sx={{ color: "#2563eb", marginBottom: "10px", marginTop: "10px" }}>
+            Danh Mục
+          </FormControl.Label>
+          <select
+            name="category_id"
+            value={formData.category_id}
+            onChange={handleChange}
+            className="w-full p-2 border-2 border-gray-300 rounded-md text-gray-900"
+          >
+            <option value="">Chọn danh mục</option>
+            {categories.map(category => (
+              <option key={category._id} value={category._id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </FormControl>
       </section>
-
-  
-
 
       <section>
         <h3 className="text-base font-semibold text-blue-600 mb-4 text-left">Giá</h3>

@@ -73,25 +73,27 @@ const ProductImages = ({
             onChange={handleDetailImagesChange}
           />
         </label>
-        <div className="mt-4 flex gap-10 flex-wrap">
-        {selectedFiles && selectedFiles.map((file, index) => (
-          <div key={index} className="relative group">
-            <img 
-              src={typeof file === 'object' 
-                      ? URL.createObjectURL(file) 
-                      : file}   
-              alt={`Ảnh ${index + 1}`} 
-              className="w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150"
-            />
-            <button 
-              onClick={() => handleImageDelete(index)}
-              className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
-
+        <div className="mt-4 flex gap-4 flex-wrap">
+          {selectedFiles && selectedFiles.map((file, index) => (
+            <div key={index} className="relative group">
+              <img 
+                src={typeof file === 'object' 
+                        ? URL.createObjectURL(file) 
+                        : file}   
+                alt={`Ảnh ${index + 1}`} 
+                className="w-24 h-24 object-cover rounded-md cursor-pointer hover:scale-150 transition-transform group-hover:scale-150"
+              />
+              <button 
+                onClick={() => handleImageDelete(index)}
+                className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold shadow-md transition-transform group-hover:translate-x-[50%] group-hover:translate-y-[-50%] group-hover:scale-150"
+              >
+                ✕
+              </button>
+              <div className="absolute bottom-0 left-0 right-0 text-xs bg-black bg-opacity-50 text-white p-1 text-center truncate">
+                {typeof file === 'object' ? 'New Image' : 'Saved Image'}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>

@@ -4,7 +4,7 @@ import './Products.css';
 import PopupDetail from '../components/ui/Popup_Detail';
 import FilterSidebar from '../components/ui/FilterSidebar';
 import ProductGrid from '../components/ui/ProductGrid';
-import { addToCart } from '../services/api/api';
+import { addToCart, getProductsWithPagination } from '../services/api/api';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -41,21 +41,13 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: pagination.currentPage,
-        limit: pagination.limit,
-        ...(filters.category && { category: filters.category }),
-        ...(filters.priceRange && { priceRange: filters.priceRange }),
-        ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
-        ...(filters.sizes.length > 0 && { sizes: filters.sizes.join(',') })
-      });
+      const response = await getProductsWithPagination(pagination.currentPage, pagination.limit);
 
-      const response = await api.get(`/products?${queryParams}`);
-      setProducts(response.data.products);
-      console.log("response.data.products:", response.data.products);
+      setProducts(response.products);
+      console.log("response.data.products:", response.products);
       setPagination(prev => ({
         ...prev,
-        totalPages: Math.ceil(response.data.total / pagination.limit)
+        totalPages: response.totalPages
       }));
       setLoading(false);
     } catch (error) {
@@ -137,7 +129,7 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-gray-50 products-container">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 text-black">
           <FilterSidebar
             filters={filters}
             categories={categories}
@@ -145,7 +137,7 @@ const Products = () => {
             onColorToggle={handleColorToggle}
             onSizeToggle={handleSizeToggle}
           />
-          <div className="flex-1">
+          <div className="flex flex-col gap-8">
             <ProductGrid
               products={products}
               loading={loading}

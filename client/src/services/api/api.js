@@ -56,6 +56,19 @@ const getProducts = async () => {
   }
 };
 
+// Lấy tất cả sản phẩm với phân trang
+const getProductsWithPagination = async (page = 1, limit = 12) => {
+  try {
+    const response = await api.get(`/products/${page}/${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching products with pagination:', error);
+    throw error;
+  }
+};
+
+
+
 // Lấy chi tiết sản phẩm theo ID
 const getProductById = async (id) => {
   try {
@@ -142,6 +155,7 @@ export default api;
 // Export các hàm API
 export {
   getProducts,
+  getProductsWithPagination,
   getProductById,
   addToCart,
   getCart,

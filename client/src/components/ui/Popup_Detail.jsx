@@ -19,7 +19,7 @@ const PopupDetail = ({ product, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div 
       ref={ref}
-      className="bg-white rounded-lg w-full max-w-4xl relative max-h-[570px] overflow-y-auto mb-10">
+      className="bg-white rounded-lg w-full max-w-4xl relative max-h-[7000px] overflow-y-auto mb-10">
         {/* Close button */}
         <button
           onClick={onClose}

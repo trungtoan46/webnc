@@ -6,7 +6,7 @@ const ProductGrid = ({ products, loading, onOpenPopup, onAddToCart }) => {
   const navigate = useNavigate();
   console.log("products:", products);
   return (
-    <div className="lg:w-3/4">
+    <div className="lg:w-full min-h-[800px]">
       {/* View Mode Toggle */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">

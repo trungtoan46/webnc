@@ -121,6 +121,52 @@ const EditProduct = ({ productId, onCancel }) => {
     console.log("category_id:", formData.category_id);
     console.log("name:", formData.name);
     try {
+      // Xử lý tải lên hình ảnh trước khi cập nhật sản phẩm
+      let finalThumbnail = thumbnail;
+      let detail_images = [...detailImages];
+      
+      // Tải lên thumbnail mới (nếu có)
+      if (thumbnail && typeof thumbnail === 'object') {
+        const thumbnailFormData = new FormData();
+        thumbnailFormData.append('images', thumbnail);
+        
+        const thumbnailResponse = await api.post('/images/upload', thumbnailFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        if (thumbnailResponse.data.urls && thumbnailResponse.data.urls.length > 0) {
+          finalThumbnail = thumbnailResponse.data.urls[0];
+        }
+      }
+      
+      // Tải lên ảnh chi tiết mới (nếu có)
+      const newDetailImages = detailImages.filter(img => typeof img === 'object');
+      if (newDetailImages.length > 0) {
+        // Tạo FormData để tải lên nhiều ảnh
+        const imageFormData = new FormData();
+        newDetailImages.forEach(img => {
+          imageFormData.append('images', img);
+        });
+        
+        // Gọi API upload ảnh
+        const uploadResponse = await api.post('/images/upload', imageFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        // Lấy URL của ảnh đã tải lên
+        const uploadedImageUrls = uploadResponse.data.urls;
+        
+        // Cập nhật mảng detail_images
+        detail_images = [
+          ...detailImages.filter(img => typeof img === 'string'), // Giữ lại các ảnh cũ (URL)
+          ...uploadedImageUrls // Thêm các URL mới
+        ];
+      }
+      
       const productData = {
         ...formData,
         name_slug: convertToVietnameseSlug(formData.name),
@@ -130,21 +176,20 @@ const EditProduct = ({ productId, onCancel }) => {
           color: v.color,
           stock: v.quantity || 0
         })),
-        tags: formData.tags || [], // Required field
-        category_id: formData.category_id, // Required field
-        thumbnail,
-        detailImages
-        
+        tags: formData.tags || [],
+        category_id: formData.category_id,
+        thumbnail: finalThumbnail,
+        detail_images: detail_images
       };
+      
       console.log("productData:", productData);
-
-
 
       await api.put(`/admin/products/${productId}`, productData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+      
       toast.success('Cập nhật sản phẩm thành công!');
     } catch (error) {
       console.error('Error updating product:', error);
