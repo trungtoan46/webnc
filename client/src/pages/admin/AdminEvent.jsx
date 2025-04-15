@@ -26,12 +26,6 @@ const AdminEvent = () => {
     image: ''
   });
 
-  const options = [
-    { value: 'all', label: 'Tất cả sự kiện' },
-    { value: 'active', label: 'Sự kiện đang hoạt động' },
-    { value: 'inactive', label: 'Sự kiện không hoạt động' },
-  ];
-
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -43,11 +37,32 @@ const AdminEvent = () => {
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/events');
-      setEvents(response.data);
-      setFilteredEvents(response.data);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.data && Array.isArray(response.data)) {
+        setEvents(response.data);
+        setFilteredEvents(response.data);
+      } else {
+        console.error('Invalid response format:', response.data);
+        setEvents([]);
+        setFilteredEvents([]);
+      }
     } catch (error) {
       console.error('Lỗi khi tải danh sách sự kiện:', error);
+      if (error.response?.status === 401) {
+        // Xử lý lỗi xác thực
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      } else if (error.response?.status === 403) {
+        // Xử lý lỗi quyền truy cập
+        alert('Bạn không có quyền truy cập vào trang này');
+        window.location.href = '/';
+      }
+      setEvents([]);
+      setFilteredEvents([]);
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +160,7 @@ const AdminEvent = () => {
     try {
       const date = new Date(dateString);
       return format(date, 'dd/MM/yyyy', { locale: vi });
-    } catch (error) {
+    } catch (_) {
       return 'Ngày không hợp lệ';
     }
   };
@@ -159,16 +174,27 @@ const AdminEvent = () => {
 
       // Nếu có file hình ảnh mới, upload lên server
       if (imageFile) {
-        const formDataImage = new FormData();
-        formDataImage.append('image', imageFile);
-        
-        const uploadResponse = await axios.post('/api/images/upload', formDataImage, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        
-        imageUrl = uploadResponse.data.imageUrl;
+        try {
+          const formDataImage = new FormData();
+          formDataImage.append('image', imageFile);
+          
+          const uploadResponse = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/images/upload`, formDataImage, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+          });
+          
+          if (uploadResponse.data && uploadResponse.data.imageUrl) {
+            imageUrl = uploadResponse.data.imageUrl;
+          } else {
+            throw new Error('Không nhận được URL hình ảnh từ server');
+          }
+        } catch (uploadError) {
+          console.error('Lỗi khi tải lên hình ảnh:', uploadError);
+          alert('Không thể tải lên hình ảnh. Vui lòng thử lại sau.');
+          return;
+        }
       }
 
       const eventData = {
@@ -179,7 +205,11 @@ const AdminEvent = () => {
       let response;
       if (selectedEvent) {
         // Cập nhật sự kiện
-        response = await axios.put(`/api/events/${selectedEvent._id}`, eventData);
+        response = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events/${selectedEvent._id}`, eventData, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         
         // Cập nhật state
         setEvents(events.map(event => 
@@ -187,7 +217,11 @@ const AdminEvent = () => {
         ));
       } else {
         // Tạo sự kiện mới
-        response = await axios.post('/api/events', eventData);
+        response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events`, eventData, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         
         // Thêm vào state
         setEvents([...events, response.data]);
@@ -198,7 +232,14 @@ const AdminEvent = () => {
       resetForm();
     } catch (error) {
       console.error('Lỗi khi lưu sự kiện:', error);
-      alert('Có lỗi xảy ra khi lưu sự kiện, vui lòng thử lại sau.');
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      } else if (error.response?.status === 403) {
+        alert('Bạn không có quyền thực hiện thao tác này');
+      } else {
+        alert(error.response?.data?.message || 'Có lỗi xảy ra khi lưu sự kiện, vui lòng thử lại sau.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -209,7 +250,11 @@ const AdminEvent = () => {
     setIsLoading(true);
 
     try {
-      await axios.delete(`/api/events/${selectedEvent._id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events/${selectedEvent._id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       
       // Cập nhật state
       setEvents(events.filter(event => event._id !== selectedEvent._id));
@@ -219,7 +264,14 @@ const AdminEvent = () => {
       setSelectedEvent(null);
     } catch (error) {
       console.error('Lỗi khi xóa sự kiện:', error);
-      alert('Có lỗi xảy ra khi xóa sự kiện, vui lòng thử lại sau.');
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      } else if (error.response?.status === 403) {
+        alert('Bạn không có quyền xóa sự kiện này');
+      } else {
+        alert(error.response?.data?.message || 'Có lỗi xảy ra khi xóa sự kiện, vui lòng thử lại sau.');
+      }
     } finally {
       setIsLoading(false);
     }
