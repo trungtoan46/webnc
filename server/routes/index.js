@@ -10,6 +10,8 @@ const productRoutes = require('./product');
 const voucherRoutes = require('./voucher');
 const uploadRoutes = require('./images/api/upload');
 const paymentRoutes = require('./payment');
+const eventRoutes = require('./event');
+
 // Mount routes
 router.use('/admin', adminRoutes);
 router.use('/auth', authRoutes); 
@@ -19,4 +21,6 @@ router.use('/products', productRoutes);
 router.use('/vouchers', voucherRoutes);
 router.use('/images', uploadRoutes);
 router.use('/payment', paymentRoutes);
+router.use('/events', eventRoutes);
+
 module.exports = router; 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/admin/Sidebar';
-import Header from '../components/admin/Header';
+import Sidebar from '../components/admin/common/Sidebar';
+import Header from '../components/admin/common/Header';
 import Dashboard from '../components/admin/Dashboard';
 import Products from './admin/Products';
 import Categories from './admin/Categories';
+import AdminEvent from './admin/AdminEvent';
 import { FiMenu } from 'react-icons/fi';
 
 const Admin = () => {
@@ -87,6 +88,8 @@ const Admin = () => {
                 return <Products />; 
             case 'categories':
                 return <Categories />;
+            case 'events':
+                return <AdminEvent />;
             default:
                 return (
                     <div className="p-6 w-full">

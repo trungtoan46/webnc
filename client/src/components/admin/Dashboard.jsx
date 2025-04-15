@@ -1,7 +1,7 @@
 import React from 'react';
-import StatsCard from './StatsCard';
-import ChartCard from './ChartCard';
-import DataTable from './DataTable';
+import StatsCard from './dashboard/StatsCard';
+import ChartCard from './dashboard/ChartCard';
+import DataTable from './dashboard/DataTable';
 
 const Dashboard = ({ stats, recentTransactions, topProducts }) => {
   return (

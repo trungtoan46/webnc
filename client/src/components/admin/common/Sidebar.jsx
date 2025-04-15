@@ -9,19 +9,22 @@ import {
   FiBarChart2,
   FiSearch,
   FiBox,
-  FiList
+  FiList,
+  FiCalendar,
+  FiUser
 } from 'react-icons/fi';
 
 const Sidebar = ({ sidebarActive, setSidebarActive }) => {
   // Menu items
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: FiHome },
-    { id: 'products', label: 'Sản phẩm', icon: FiBox },
-    { id: 'categories', label: 'Danh mục', icon: FiList },
-    { id: 'orders', label: 'Đơn hàng', icon: FiShoppingCart },
-    { id: 'customers', label: 'Khách hàng', icon: FiUsers },
+    { id: 'dashboard', label: 'Dashboard', icon: <FiHome size={20}/> },
+    { id: 'products', label: 'Sản phẩm', icon: <FiBox size={20} /> },
+    { id: 'categories', label: 'Danh mục', icon: <FiList size={20}/> },
+    { id: 'orders', label: 'Đơn hàng', icon: <FiShoppingCart size={20}/> },
+    { id: 'customers', label: 'Khách hàng', icon: <FiUser size={20} /> },
+    { id: 'events', label: 'Sự kiện', icon: <FiCalendar size={20} /> },
     { id: 'analytics', label: 'Analytics', icon: <FiBarChart2 size={20} /> },
-    { id: 'settings', label: 'Cài đặt', icon: FiSettings }
+    { id: 'settings', label: 'Cài đặt', icon: <FiSettings size={20} /> }
   ];
 
   return (
@@ -73,8 +76,8 @@ const Sidebar = ({ sidebarActive, setSidebarActive }) => {
             <span className="text-gray-600 font-medium">R</span>
           </div>
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-800">Randhir kumar</p>
-            <p className="text-xs text-gray-500">admin@ega.com</p>
+            <p className="text-sm font-medium text-gray-800"></p>
+            <p className="text-xs text-gray-500"></p>
           </div>
         </div>
       </div>

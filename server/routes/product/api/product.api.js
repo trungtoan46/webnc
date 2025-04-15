@@ -14,6 +14,16 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+// routes/products.js
+router.get('/', async (req, res) => {
+  try {
+    const products = await Product.find().populate('event').exec();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+});
+
 
 // Get product by slug name - ĐẶT TRƯỚC các route có pattern tương tự
 router.get('/name/:name_slug', async (req, res) => {

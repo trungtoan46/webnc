@@ -7,7 +7,7 @@ const EventSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true,
+        required: false,
     },
     start_date: {
         type: Date,
@@ -28,6 +28,10 @@ const EventSchema = new mongoose.Schema({
     updated_at: {
         type: Date,
         default: Date.now,
+    },
+    image: {
+        type: String,
+        required: false,
     },
 }); 
 

@@ -370,11 +370,27 @@ const ProductDetail = () => {
             onMouseLeave={handleImageMouseLeave}
             onMouseMove={handleImageMouseMove}
           >
+            {product.event?  (
+              <div className="absolute top-0 left-0 w-full h-full">
+                <img 
+                  src={product.event.image} 
+                  alt={product.event.name} 
+                  className= "absolute inset-0 w-full h-full object-cover"
+                />
+                <img 
+                  src={images[activeImage] || 'https://via.placeholder.com/600x400'} 
+                  alt={product.name} 
+                  className="absolute inset-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)] object-contain z-10"
+                  />
+
+              </div>
+            ): null}
             <img 
-              src={images[activeImage] || 'https://via.placeholder.com/600x400'} 
-              alt={product.name} 
-              className="w-full h-full object-contain"
-            />
+                src={images[activeImage] || 'https://via.placeholder.com/600x400'} 
+                alt={product.name} 
+                className="w-full h-full object-contain"
+              />
+            
             
             {/* Zoom overlay */}
             {zoomed && images[activeImage] && (

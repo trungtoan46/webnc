@@ -86,6 +86,7 @@ const ProductSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Event',
         required: false,
+        default: null,
     },
 });
 ProductSchema.plugin(AutoIncrement, { inc_field: 'product_id' });
