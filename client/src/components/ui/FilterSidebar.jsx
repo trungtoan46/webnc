@@ -47,7 +47,7 @@ const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onS
   ];
 
   return (
-    <div className="w-full bg-white p-4 rounded-lg shadow">
+    <div className="w-1/3 bg-white p-4 rounded-lg shadow">
       <h2 className="text-lg font-semibold mb-4 flex items-center text-gray-700">
         <FiFilter className="mr-2" />
         Filters

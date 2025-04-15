@@ -27,3 +27,8 @@ lerna-debug.log*
 .idea/
 
 
+# .env 
+.env    
+/client/.env
+/server/.env
+server/.env

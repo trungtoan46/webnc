@@ -19,7 +19,6 @@ api.interceptors.request.use(
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
-    // Không set Content-Type mặc định để axios tự động xử lý
     return config;
   },
   (error) => {
@@ -34,7 +33,6 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Token hết hạn hoặc không hợp lệ
       localStorage.removeItem("token");
       delete api.defaults.headers.common["Authorization"];
       window.location.href = "/login";
@@ -59,15 +57,13 @@ const getProducts = async () => {
 // Lấy tất cả sản phẩm với phân trang
 const getProductsWithPagination = async (page = 1, limit = 12) => {
   try {
-    const response = await api.get(`/products/${page}/${limit}`);
+    const response = await api.get(`/products?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching products with pagination:', error);
     throw error;
   }
 };
-
-
 
 // Lấy chi tiết sản phẩm theo ID
 const getProductById = async (id) => {
@@ -83,22 +79,16 @@ const getProductById = async (id) => {
 // Thêm sản phẩm vào giỏ hàng
 const addToCart = async ({ productId, quantity }) => {
   try {
-    console.log('Adding to cart:', { productId, quantity }); // Kiểm tra dữ liệu gửi đi
-    
     const response = await api.post('/cart', {
       productId,
       quantity
     });
-
-    console.log('Response:', response.data); // Kiểm tra phản hồi từ API
-
     return response.data;
   } catch (error) {
     console.error('Error adding product to cart:', error.response?.data || error.message);
     throw error;
   }
 };
-
 
 // Lấy thông tin giỏ hàng
 const getCart = async () => {
@@ -114,11 +104,10 @@ const getCart = async () => {
 // Tạo sản phẩm mới (cho admin)
 const createProduct = async (productData) => {
   try {
-    const response =
-    await api.post('/products', productData, 
-      {
+    const response = await api.post('/admin/products', productData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
     return response.data;
@@ -131,7 +120,12 @@ const createProduct = async (productData) => {
 // Cập nhật sản phẩm (cho admin)
 const updateProduct = async (id, productData) => {
   try {
-    const response = await api.put(`/products/${id}`, productData);
+    const response = await api.put(`/admin/products/${id}`, productData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
     return response.data;
   } catch (error) {
     console.error(`Error updating product with ID ${id}:`, error);
@@ -142,7 +136,11 @@ const updateProduct = async (id, productData) => {
 // Xóa sản phẩm (cho admin)
 const deleteProduct = async (id) => {
   try {
-    const response = await api.delete(`/products/${id}`);
+    const response = await api.delete(`/admin/products/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
     return response.data;
   } catch (error) {
     console.error(`Error deleting product with ID ${id}:`, error);
@@ -152,7 +150,6 @@ const deleteProduct = async (id) => {
 
 export default api;
 
-// Export các hàm API
 export {
   getProducts,
   getProductsWithPagination,

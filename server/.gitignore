@@ -38,3 +38,8 @@ coverage/
 .cache/
 .tmp/
 .temp/
+
+# .env 
+.env    
+/client/.env
+/server/.env

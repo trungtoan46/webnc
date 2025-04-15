@@ -41,17 +41,28 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await getProductsWithPagination(pagination.currentPage, pagination.limit);
+      const filters = {
+        ...(filters.category && { category: filters.category }),
+        ...(filters.priceRange && { priceRange: filters.priceRange }),
+        ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
+        ...(filters.sizes.length > 0 && { sizes: filters.sizes.join(',') })
+      };
 
-      setProducts(response.products);
-      console.log("response.data.products:", response.products);
+      const response = await getProductsWithPagination(pagination.currentPage, pagination.limit, filters);
+      
+      setProducts(response.products || []);
       setPagination(prev => ({
         ...prev,
-        totalPages: response.totalPages
+        totalPages: response.totalPages || 1
       }));
       setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
+      setProducts([]);
+      setPagination(prev => ({
+        ...prev,
+        totalPages: 1
+      }));
       setLoading(false);
     }
   };
@@ -125,11 +136,14 @@ const Products = () => {
     }
   };
   console.log("products:", products); 
+  if (products.length === 0) {
+    return <div className="text-center text-gray-500 mt-4">Không có sản phẩm nào.</div>
+  }
 
-  return (
-    <div className="min-h-screen bg-gray-50 products-container">
+    return (
+      <div className="min-h-screen bg-gray-50 products-container">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col lg:flex-row gap-8 text-black">
+        <div className="flex flex-col lg:flex-row gap-8">
           <FilterSidebar
             filters={filters}
             categories={categories}
@@ -137,101 +151,116 @@ const Products = () => {
             onColorToggle={handleColorToggle}
             onSizeToggle={handleSizeToggle}
           />
-          <div className="flex flex-col gap-8">
-            <ProductGrid
-              products={products}
-              loading={loading}
-              onOpenPopup={handleOpenPopup}
-              onAddToCart={handleAddToCart}
-            />
-            
-            {/* Pagination */}
-            <div className="mt-8 flex justify-center">
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  disabled={pagination.currentPage === 1}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                    pagination.currentPage === 1
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  Previous
-                </button>
+          <div className="flex-1">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="text-center py-12">
+                <h2 className="text-2xl font-semibold text-gray-600">No products found</h2>
+                <p className="mt-2 text-gray-500">Try adjusting your filters or check back later.</p>
+              </div>
+            ) : (
+              <>
+                <ProductGrid
+                  products={products}
+                  loading={loading}
+                  onOpenPopup={handleOpenPopup}
+                  onAddToCart={handleAddToCart}
+                />
                 
-                {(() => {
-                  const totalPages = Math.max(1, Math.min(pagination.totalPages || 1, 100)); // Ensure valid range
-                  const currentPage = pagination.currentPage;
-                  const delta = 2; // Number of pages to show before and after current page
-                  
-                  let pages = [];
-                  let leftBound = Math.max(1, currentPage - delta);
-                  let rightBound = Math.min(totalPages, currentPage + delta);
-
-                  // Adjust bounds to always show 5 pages when possible
-                  if (rightBound - leftBound < 4) {
-                    if (leftBound === 1) {
-                      rightBound = Math.min(5, totalPages);
-                    } else if (rightBound === totalPages) {
-                      leftBound = Math.max(1, totalPages - 4);
-                    }
-                  }
-
-                  // Add first page if needed
-                  if (leftBound > 1) {
-                    pages.push(1);
-                    if (leftBound > 2) pages.push('...');
-                  }
-
-                  // Add pages in range
-                  for (let i = leftBound; i <= rightBound; i++) {
-                    pages.push(i);
-                  }
-
-                  // Add last page if needed
-                  if (rightBound < totalPages) {
-                    if (rightBound < totalPages - 1) pages.push('...');
-                    pages.push(totalPages);
-                  }
-
-                  return pages.map((page, index) => 
-                    page === '...' ? (
-                      <span
-                        key={`ellipsis-${index}`}
-                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-700"
-                      >
-                        ...
-                      </span>
-                    ) : (
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className="mt-8 flex justify-center">
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                       <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          currentPage === page
-                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        onClick={() => handlePageChange(pagination.currentPage - 1)}
+                        disabled={pagination.currentPage === 1}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                          pagination.currentPage === 1
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-500 hover:bg-gray-50'
                         }`}
                       >
-                        {page}
+                        Previous
                       </button>
-                    )
-                  );
-                })()}
-                
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  disabled={pagination.currentPage === pagination.totalPages}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                    pagination.currentPage === pagination.totalPages
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  Next
-                </button>
-              </nav>
-            </div>
+                      
+                      {(() => {
+                        const totalPages = Math.max(1, Math.min(pagination.totalPages || 1, 100)); // Ensure valid range
+                        const currentPage = pagination.currentPage;
+                        const delta = 2; // Number of pages to show before and after current page
+                        
+                        let pages = [];
+                        let leftBound = Math.max(1, currentPage - delta);
+                        let rightBound = Math.min(totalPages, currentPage + delta);
+
+                        // Adjust bounds to always show 5 pages when possible
+                        if (rightBound - leftBound < 4) {
+                          if (leftBound === 1) {
+                            rightBound = Math.min(5, totalPages);
+                          } else if (rightBound === totalPages) {
+                            leftBound = Math.max(1, totalPages - 4);
+                          }
+                        }
+
+                        // Add first page if needed
+                        if (leftBound > 1) {
+                          pages.push(1);
+                          if (leftBound > 2) pages.push('...');
+                        }
+
+                        // Add pages in range
+                        for (let i = leftBound; i <= rightBound; i++) {
+                          pages.push(i);
+                        }
+
+                        // Add last page if needed
+                        if (rightBound < totalPages) {
+                          if (rightBound < totalPages - 1) pages.push('...');
+                          pages.push(totalPages);
+                        }
+
+                        return pages.map((page, index) => 
+                          page === '...' ? (
+                            <span
+                              key={`ellipsis-${index}`}
+                              className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-700"
+                            >
+                              ...
+                            </span>
+                          ) : (
+                            <button
+                              key={page}
+                              onClick={() => handlePageChange(page)}
+                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                currentPage === page
+                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          )
+                        );
+                      })()}
+                      
+                      <button
+                        onClick={() => handlePageChange(pagination.currentPage + 1)}
+                        disabled={pagination.currentPage === pagination.totalPages}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                          pagination.currentPage === pagination.totalPages
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        Next
+                      </button>
+                    </nav>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
