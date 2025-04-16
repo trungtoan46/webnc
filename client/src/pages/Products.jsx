@@ -41,21 +41,33 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const filters = {
-        ...(filters.category && { category: filters.category }),
-        ...(filters.priceRange && { priceRange: filters.priceRange }),
-        ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
-        ...(filters.sizes.length > 0 && { sizes: filters.sizes.join(',') })
-      };
-
-      const response = await getProductsWithPagination(pagination.currentPage, pagination.limit, filters);
+      const queryParams = new URLSearchParams();
       
-      setProducts(response.products || []);
-      setPagination(prev => ({
-        ...prev,
-        totalPages: response.totalPages || 1
-      }));
-      setLoading(false);
+      // Thêm các filter vào query params
+      if (filters.category) queryParams.append('category', filters.category);
+      if (filters.priceRange) queryParams.append('priceRange', filters.priceRange);
+      if (filters.colors.length > 0) queryParams.append('colors', filters.colors.join(','));
+      if (filters.sizes.length > 0) queryParams.append('sizes', filters.sizes.join(','));
+      
+      // Thêm pagination
+      queryParams.append('page', pagination.currentPage);
+      queryParams.append('limit', pagination.limit);
+
+      const response = await api.get(`/products?${queryParams.toString()}`);
+      
+      if (response.data && response.data.products) {
+        setProducts(response.data.products);
+        setPagination(prev => ({
+          ...prev,
+          totalPages: response.data.totalPages || 1
+        }));
+      } else {
+        setProducts([]);
+        setPagination(prev => ({
+          ...prev,
+          totalPages: 1
+        }));
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
       setProducts([]);
@@ -63,6 +75,7 @@ const Products = () => {
         ...prev,
         totalPages: 1
       }));
+    } finally {
       setLoading(false);
     }
   };
@@ -136,9 +149,7 @@ const Products = () => {
     }
   };
   console.log("products:", products); 
-  if (products.length === 0) {
-    return <div className="text-center text-gray-500 mt-4">Không có sản phẩm nào.</div>
-  }
+  
 
     return (
       <div className="min-h-screen bg-gray-50 products-container">

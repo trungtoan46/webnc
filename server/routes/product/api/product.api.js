@@ -4,16 +4,68 @@ const { Product } = require('../../../models/index.model');
 const auth = require('../../../middleware/auth');
 
 
-// Get all products
+// Get all products with filters and pagination
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const { 
+      page = 1, 
+      limit = 12, 
+      category, 
+      priceRange, 
+      colors, 
+      sizes 
+    } = req.query;
+
+    // Build query
+    const query = {};
+    
+    if (category) {
+      query.category_id = category;
+    }
+    
+    if (priceRange) {
+      const [min, max] = priceRange.split('-').map(Number);
+      query.price = { $gte: min, $lte: max };
+    }
+    
+    if (colors) {
+      const colorArray = colors.split(',');
+      query['variants.color'] = { $in: colorArray };
+    }
+    
+    if (sizes) {
+      const sizeArray = sizes.split(',');
+      query['variants.size'] = { $in: sizeArray };
+    }
+
+    // Get total count
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    // Get products with pagination
+    const products = await Product.find(query)
+      .populate('category_id', 'name')
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .sort({ created_at: -1 });
+
+    res.json({
+      success: true,
+      products,
+      totalPages,
+      currentPage: parseInt(page),
+      totalProducts
+    });
   } catch (error) {
     console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error',
+      error: error.message 
+    });
   }
 });
+
 // routes/products.js
 router.get('/', async (req, res) => {
   try {
