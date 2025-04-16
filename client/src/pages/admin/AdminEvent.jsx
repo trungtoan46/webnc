@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import Search from '../../components/admin/common/Search';
 import EventForm from '../../components/admin/forms/EventForm';
-import { FiEdit, FiTrash2, FiEye } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiEye, FiLink } from 'react-icons/fi';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -15,19 +15,24 @@ const AdminEvent = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     start_date: '',
     end_date: '',
     is_active: true,
-    image: ''
+    image: '',
+    products: []
   });
 
   useEffect(() => {
     fetchEvents();
+    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -65,6 +70,19 @@ const AdminEvent = () => {
       setFilteredEvents([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/products`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setProducts(response.data.products);
+    } catch (error) {
+      console.error('Lỗi khi tải danh sách sản phẩm:', error);
     }
   };
 
@@ -122,7 +140,8 @@ const AdminEvent = () => {
       start_date: '',
       end_date: '',
       is_active: true,
-      image: ''
+      image: '',
+      products: []
     });
     setImageFile(null);
     setSelectedEvent(null);
@@ -141,7 +160,8 @@ const AdminEvent = () => {
       start_date: formatDateForInput(event.start_date),
       end_date: formatDateForInput(event.end_date),
       is_active: event.is_active,
-      image: event.image || ''
+      image: event.image || '',
+      products: event.products || []
     });
     setIsModalOpen(true);
   };
@@ -149,6 +169,12 @@ const AdminEvent = () => {
   const openDeleteModal = (event) => {
     setSelectedEvent(event);
     setIsDeleteModalOpen(true);
+  };
+
+  const openLinkModal = (event) => {
+    setSelectedEvent(event);
+    setSelectedProducts(event.products || []);
+    setIsLinkModalOpen(true);
   };
 
   const formatDateForInput = (dateString) => {
@@ -160,8 +186,37 @@ const AdminEvent = () => {
     try {
       const date = new Date(dateString);
       return format(date, 'dd/MM/yyyy', { locale: vi });
-    } catch (_) {
+    } catch {
       return 'Ngày không hợp lệ';
+    }
+  };
+
+  const handleProductSelect = (selectedOptions) => {
+    setSelectedProducts(selectedOptions.map(option => option.value));
+  };
+
+  const handleLinkProducts = async () => {
+    setIsLoading(true);
+    try {
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events/${selectedEvent._id}/products`, {
+        products: selectedProducts
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      // Cập nhật state
+      setEvents(events.map(event => 
+        event._id === selectedEvent._id ? { ...event, products: selectedProducts } : event
+      ));
+      
+      setIsLinkModalOpen(false);
+    } catch (error) {
+      console.error('Lỗi khi liên kết sản phẩm:', error);
+      alert('Có lỗi xảy ra khi liên kết sản phẩm, vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -282,9 +337,10 @@ const AdminEvent = () => {
     }
   };
 
+
   return (
     <div className="min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-4">Quản Lý Sự Kiện</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-900">Quản Lý Sự Kiện</h1>
       
       {/* Bộ lọc và tìm kiếm */}
       <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -300,24 +356,24 @@ const AdminEvent = () => {
             onClick={() => handleFilterChange('active')}
           >
             Đang hoạt động
-            </button>
+          </button>
           <button 
             className={`px-4 py-2 rounded-md text-white ${filter === 'inactive' ? 'bg-red-600' : 'bg-gray-500'}`}
             onClick={() => handleFilterChange('inactive')}
           >
             Không hoạt động
-            </button>
-         </div>
+          </button>
+        </div>
         
         <div className="flex-1 max-w-md">
           <input
             type="text"
             placeholder="Tìm kiếm sự kiện..."
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
           />
-         </div>
+        </div>
         
         <button 
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
@@ -328,10 +384,10 @@ const AdminEvent = () => {
       </div>
 
       {/* Bảng sự kiện */}
-      {isLoading && <div className="text-center py-4">Đang tải...</div>}
+      {isLoading && <div className="text-center py-4 text-gray-700">Đang tải...</div>}
       
       {!isLoading && filteredEvents.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-600">
           Không tìm thấy sự kiện nào
         </div>
       ) : (
@@ -339,18 +395,18 @@ const AdminEvent = () => {
           <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-md">
             <thead className="bg-gray-100">
               <tr>
-                <th className="py-3 px-4 border-b text-left">Tên sự kiện</th>
-                <th className="py-3 px-4 border-b text-left">Hình ảnh</th>
-                <th className="py-3 px-4 border-b text-left">Ngày bắt đầu</th>
-                <th className="py-3 px-4 border-b text-left">Ngày kết thúc</th>
-                <th className="py-3 px-4 border-b text-left">Trạng thái</th>
-                <th className="py-3 px-4 border-b text-left">Thao tác</th>
+                <th className="py-3 px-4 border-b text-left text-gray-900">Tên sự kiện</th>
+                <th className="py-3 px-4 border-b text-left text-gray-900">Hình ảnh</th>
+                <th className="py-3 px-4 border-b text-left text-gray-900">Ngày bắt đầu</th>
+                <th className="py-3 px-4 border-b text-left text-gray-900">Ngày kết thúc</th>
+                <th className="py-3 px-4 border-b text-left text-gray-900">Trạng thái</th>
+                <th className="py-3 px-4 border-b text-left text-gray-900">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {filteredEvents.map(event => (
                 <tr key={event._id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 border-b">{event.name}</td>
+                  <td className="py-3 px-4 border-b text-gray-800">{event.name}</td>
                   <td className="py-3 px-4 border-b">
                     {event.image ? (
                       <img 
@@ -359,11 +415,11 @@ const AdminEvent = () => {
                         className="h-12 w-auto object-contain"
                       />
                     ) : (
-                      <span className="text-gray-400">Không có hình</span>
+                      <span className="text-gray-500">Không có hình</span>
                     )}
                   </td>
-                  <td className="py-3 px-4 border-b">{formatDateForDisplay(event.start_date)}</td>
-                  <td className="py-3 px-4 border-b">{formatDateForDisplay(event.end_date)}</td>
+                  <td className="py-3 px-4 border-b text-gray-800">{formatDateForDisplay(event.start_date)}</td>
+                  <td className="py-3 px-4 border-b text-gray-800">{formatDateForDisplay(event.end_date)}</td>
                   <td className="py-3 px-4 border-b">
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       event.is_active 
@@ -381,6 +437,13 @@ const AdminEvent = () => {
                         title="Chỉnh sửa"
                       >
                         <FiEdit size={18} />
+                      </button>
+                      <button 
+                        onClick={() => openLinkModal(event)}
+                        className="p-1 text-purple-600 hover:text-purple-800"
+                        title="Liên kết sản phẩm"
+                      >
+                        <FiLink size={18} />
                       </button>
                       <button 
                         onClick={() => openDeleteModal(event)}
@@ -422,14 +485,14 @@ const AdminEvent = () => {
                   disabled={isLoading}
                 >
                   Hủy
-            </button>
+                </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
                   disabled={isLoading}
                 >
                   {isLoading ? 'Đang lưu...' : 'Lưu Sự Kiện'}
-            </button>
+                </button>
               </div>
             </form>
           </div>
@@ -462,7 +525,96 @@ const AdminEvent = () => {
               </button>
             </div>
           </div>
-      </div>
+        </div>
+      )}
+
+      {/* Modal Liên kết Sản phẩm */}
+      {isLinkModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <h2 className="text-xl font-bold mb-4 text-gray-900">Liên kết Sản phẩm với Sự Kiện</h2>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Chọn sản phẩm
+              </label>
+              <Select
+                isMulti
+                options={products.map(product => ({
+                  value: product._id,
+                  label: (
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={product.images?.[0] || '/placeholder-image.jpg'} 
+                        alt={product.name}
+                        className="w-8 h-8 object-cover rounded"
+                      />
+                      <span className="text-gray-800">{product.name}</span>
+                    </div>
+                  ),
+                  name: product.name,
+                  image: product.images?.[0]
+                }))}
+                value={selectedProducts.map(id => {
+                  const product = products.find(p => p._id === id);
+                  return {
+                    value: id,
+                    label: (
+                      <div className="flex items-center space-x-2">
+                        <img 
+                          src={product?.thumbnail || '/placeholder-image.jpg'} 
+                          alt={product?.name}
+                          className="w-8 h-8 object-cover rounded"
+                        />
+                        <span className="text-gray-800">{product?.name}</span>
+                      </div>
+                    )
+                  }
+                })}
+                onChange={handleProductSelect}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                formatOptionLabel={({ label }) => label}
+              />
+            </div>
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Sản phẩm đã chọn:</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {selectedProducts.map(id => {
+                  const product = products.find(p => p._id === id);
+                  return (
+                    <div key={id} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                      <img 
+                        src={product?.thumbnail || '/placeholder-image.jpg'} 
+                        alt={product?.name}
+                        className="w-12 h-12 object-cover rounded"
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{product?.name}</p>
+                        <p className="text-xs text-gray-600">{product?.price?.toLocaleString('vi-VN')}đ</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setIsLinkModalOpen(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+                disabled={isLoading}
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleLinkProducts}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-purple-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Đang lưu...' : 'Lưu Liên kết'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

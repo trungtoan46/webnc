@@ -148,6 +148,20 @@ const deleteProduct = async (id) => {
   }
 };
 
+// lấy event
+const getEvents = async () => {
+  try {
+    const response = await api.get('/events');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    throw error;
+  }
+};
+
+
+
+
 export default api;
 
 export {
@@ -158,5 +172,6 @@ export {
   getCart,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getEvents
 }; 

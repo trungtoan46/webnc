@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const { Event } = require('../../../models/index.model');
-const authenticateAdmin = require('../../../middleware/authAdmin');
+const {isAdmin, isAuthenticated} = require('../../../middleware/auth');
+
 
 // Get all events
-router.get('/', async (req, res) => {
+router.get('/', isAuthenticated, async (req, res) => {
   try {
     const events = await Event.find();
     res.json(events);
   } catch (error) {
     console.error('Error fetching events:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' , error: error.message});
   }
 });
 
@@ -24,12 +25,12 @@ router.get('/:id', async (req, res) => {
     res.json(event);
   } catch (error) {
     console.error('Error fetching event:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' , error: error.message });
   }
 });
 
 // Create new event (admin only)
-router.post('/', authenticateAdmin, async (req, res) => {
+router.post('/', isAdmin, async (req, res) => {
   try {
     const { name, description, start_date, end_date, image, is_active } = req.body;
     const newEvent = new Event({
@@ -49,7 +50,7 @@ router.post('/', authenticateAdmin, async (req, res) => {
 });
 
 // Update event (admin only)
-router.put('/:id', authenticateAdmin, async (req, res) => {
+router.put('/:id', isAdmin, async (req, res) => {
   try {
     const { name, description, start_date, end_date, image, is_active } = req.body;
     const updatedEvent = await Event.findByIdAndUpdate(
@@ -76,7 +77,7 @@ router.put('/:id', authenticateAdmin, async (req, res) => {
 });
 
 // Delete event (admin only)
-router.delete('/:id', authenticateAdmin, async (req, res) => {
+router.delete('/:id', isAdmin, async (req, res) => {
   try {
     const deletedEvent = await Event.findByIdAndDelete(req.params.id);
     if (!deletedEvent) {
@@ -99,5 +100,25 @@ router.get('/status/active', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
+// Link products to event
+router.put('/:id/products', isAdmin, async (req, res) => {
+  try {
+    const { products } = req.body;
+    const event = await Event.findById(req.params.id);  
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    event.products = products;
+    await event.save();
+    res.json(event);
+  } catch (error) {
+    console.error('Error linking products to event:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 module.exports = router; 

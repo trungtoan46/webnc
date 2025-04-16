@@ -4,16 +4,17 @@ import './Products.css';
 import PopupDetail from '../components/ui/Popup_Detail';
 import FilterSidebar from '../components/ui/FilterSidebar';
 import ProductGrid from '../components/ui/ProductGrid';
-import { addToCart, getProductsWithPagination } from '../services/api/api';
+import { addToCart, getProductsWithPagination, getEvents } from '../services/api/api';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [events, setEvents] = useState([]);
   const [filters, setFilters] = useState({
     category: '',
-    priceRange: '',
+    priceRange: '', 
     colors: [],
     sizes: []
   });
@@ -28,6 +29,21 @@ const Products = () => {
     fetchCategories();
     fetchProducts();
   }, [pagination.currentPage, filters]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const events = await getEvents();
+        setEvents(events);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEvents();
+  }, []);
+  console.log("events:", events);
 
   const fetchCategories = async () => {
     try {
@@ -175,6 +191,7 @@ const Products = () => {
               <>
                 <ProductGrid
                   products={products}
+                  events={events}
                   loading={loading}
                   onOpenPopup={handleOpenPopup}
                   onAddToCart={handleAddToCart}

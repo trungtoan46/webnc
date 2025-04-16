@@ -13,7 +13,7 @@ const Nav = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { user, handleLogout } = useContext(AuthContext);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
 

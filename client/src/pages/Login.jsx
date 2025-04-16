@@ -7,7 +7,7 @@ import AuthLayout from "../layouts/AuthLayout";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { handleLogin } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
@@ -16,7 +16,7 @@ const Login = () => {
     setError("");
     console.log(email, password);
     try {
-      await handleLogin(email, password);
+      await login(email, password);
       navigate("/");
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
