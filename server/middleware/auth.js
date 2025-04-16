@@ -1,7 +1,7 @@
 // server/middleware/auth.js
 const jwt = require('jsonwebtoken');
 
-const auth = (req, res, next) => {
+const isAuthenticated = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1]; // Get token from Authorization header
     
     if (!token) return res.status(401).json({ message: 'Access denied' });
@@ -15,4 +15,14 @@ const auth = (req, res, next) => {
     }
 };
 
-module.exports = auth;
+const isAdmin = (req, res, next) => {
+    if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    }
+    next();
+};
+
+module.exports = {
+    isAuthenticated,
+    isAdmin
+};
