@@ -175,10 +175,15 @@ const AdminEvent = () => {
       // Nếu có file hình ảnh mới, upload lên server
       if (imageFile) {
         try {
+          console.log(imageFile);
           const formDataImage = new FormData();
           formDataImage.append('image', imageFile);
+          for (let [key, value] of formDataImage.entries()) {
+            console.log(key, value);
+          }
           
-          const uploadResponse = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/images/upload`, formDataImage, {
+          
+          const uploadResponse = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/images/upload-event`, formDataImage, {
             headers: {
               'Content-Type': 'multipart/form-data',
               'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -250,7 +255,7 @@ const AdminEvent = () => {
     setIsLoading(true);
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events/${selectedEvent._id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/events/${selectedEvent._id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -295,14 +300,14 @@ const AdminEvent = () => {
             onClick={() => handleFilterChange('active')}
           >
             Đang hoạt động
-          </button>
+            </button>
           <button 
             className={`px-4 py-2 rounded-md text-white ${filter === 'inactive' ? 'bg-red-600' : 'bg-gray-500'}`}
             onClick={() => handleFilterChange('inactive')}
           >
             Không hoạt động
-          </button>
-        </div>
+            </button>
+         </div>
         
         <div className="flex-1 max-w-md">
           <input
@@ -312,7 +317,7 @@ const AdminEvent = () => {
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
           />
-        </div>
+         </div>
         
         <button 
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
@@ -417,14 +422,14 @@ const AdminEvent = () => {
                   disabled={isLoading}
                 >
                   Hủy
-                </button>
+            </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
                   disabled={isLoading}
                 >
                   {isLoading ? 'Đang lưu...' : 'Lưu Sự Kiện'}
-                </button>
+            </button>
               </div>
             </form>
           </div>
@@ -457,7 +462,7 @@ const AdminEvent = () => {
               </button>
             </div>
           </div>
-        </div>
+      </div>
       )}
     </div>
   );

@@ -24,6 +24,7 @@ const uploadImages = async (req, res) => {
   }
 };
 
+
 const removeImages = async (req, res) => {
   try {
     const { public_id } = req.body;
