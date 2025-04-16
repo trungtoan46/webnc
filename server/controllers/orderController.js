@@ -1,11 +1,13 @@
 const Order = require('../models/Order.model');
 const Product = require('../models/Product.model');
 const Event = require('../models/Event.model');
+const User = require('../models/User.model');
+const { isAuthenticated, isAdmin } = require('../middleware/auth');
 
 // Tạo đơn hàng mới
 exports.createOrder = async (req, res) => {
   try {
-    const { products, shippingAddress, paymentMethod, eventId } = req.body;
+      const {user, products, shippingInfo, paymentMethod, eventId } = req.body;
     
     // Tính tổng tiền
     let totalAmount = 0;
@@ -16,10 +18,10 @@ exports.createOrder = async (req, res) => {
 
     // Tạo đơn hàng
     const order = new Order({
-      user: req.user._id,
+      user,
       products,
       totalAmount,
-      shippingAddress,
+      shippingInfo,
       paymentMethod,
       event: eventId
     });

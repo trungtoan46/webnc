@@ -24,7 +24,7 @@ const Order = () => {
           status: selectedStatus !== 'all' ? selectedStatus : undefined
         }
       });
-      setOrders(response.data);
+      setOrders(response.data.orders || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error('Không thể tải danh sách đơn hàng');
@@ -130,64 +130,78 @@ const Order = () => {
                 </div>
               </div>
             ) : (
-              orders.length > 1 ? (
-              orders.map((order):  => (
-                <div key={order._id} className="p-6 hover:bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900">
-                        Đơn hàng #{order.orderNumber}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Ngày đặt: {formatDate(order.createdAt)}
-                      </p>
+              orders.length > 0 ? (
+                orders.map((order) => (
+                  <div key={order._id} className="p-6 hover:bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Đơn hàng #{order._id}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Ngày đặt: {formatDate(order.createdAt)}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                          {getStatusText(order.status)}
+                        </span>
+                        <span className="text-lg font-medium text-gray-900">
+                          {formatPrice(order.totalAmount)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                        {getStatusText(order.status)}
-                      </span>
-                      <span className="text-lg font-medium text-gray-900">
-                        {formatPrice(order.total)}
-                      </span>
-                    </div>
-                  </div>
 
-                  <div className="mt-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex-1">
-                        <h4 className="text-sm font-medium text-gray-900">Sản phẩm</h4>
-                        <div className="mt-2 space-y-2">
-                          {order.items.map((item) => (
-                            <div key={item._id} className="flex items-center">
-                              <img
-                                src={item.product.thumbnail}
-                                alt={item.product.name}
-                                className="h-12 w-12 rounded-md object-cover"
-                              />
-                              <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-900">
-                                  {item.product.name}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  {item.quantity} x {formatPrice(item.price)}
-                                </p>
+                    <div className="mt-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-900">Sản phẩm</h4>
+                          <div className="mt-2 space-y-2">
+                            {order.products.map((item) => (
+                              <div key={item._id} className="flex items-center">
+                                <img
+                                  src={item.product.thumbnail}
+                                  alt={item.product.name}
+                                  className="h-12 w-12 rounded-md object-cover"
+                                />
+                                <div className="ml-4">
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {item.product.name}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    {item.quantity} x {formatPrice(item.price)}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Link
+                            to={`/orders/${order._id}`}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                          >
+                            Xem chi tiết
+                          </Link>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Link
-                          to={`/orders/${order._id}`}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-500"
-                        >
-                          Xem chi tiết
-                        </Link>
-                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <h3 className="text-lg font-medium text-gray-900">Không có đơn hàng nào</h3>
+                  <p className="mt-2 text-gray-500">Bạn chưa có đơn hàng nào trong danh sách này.</p>
+                  <div className="mt-6">
+                    <Link
+                      to="/products"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Mua sắm ngay
+                    </Link>
+                  </div>
                 </div>
-              ))
+              )
             )}
           </div>
         </div>

@@ -27,6 +27,7 @@ export const login = async (email, password) => {
     // Kiểm tra và lưu token
     if (response.data && response.data.token) {
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userId", response.data.user.id);
       api.defaults.headers["Authorization"] = `Bearer ${response.data.token}`;
       return response.data;
     } else {

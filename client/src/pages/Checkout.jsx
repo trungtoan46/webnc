@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaArrowLeft, FaCreditCard, FaMoneyBill, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope } from 'react-icons/fa';
 import logo from '../assets/logo.webp';
+import api from '../services/api/api';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -24,14 +25,27 @@ const Checkout = () => {
     if (storedCart) {
       try {
         const cart = JSON.parse(storedCart);
+        // Kiểm tra xem cart có phải là mảng không
+        if (!Array.isArray(cart)) {
+          throw new Error('Dữ liệu giỏ hàng không hợp lệ');
+        }
         setCartItems(cart);
 
         // Tính tổng tiền
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const total = cart.reduce((sum, item) => {
+          // Kiểm tra xem item có đủ thông tin không
+          if (!item || typeof item !== 'object' || !item.price || !item.quantity) {
+            return sum;
+          }
+          return sum + (item.price * item.quantity);
+        }, 0);
         setTotalPrice(total);
       } catch (error) {
         console.error('Lỗi khi đọc giỏ hàng:', error);
         toast.error('Không thể tải thông tin giỏ hàng');
+        // Xóa giỏ hàng không hợp lệ
+        localStorage.removeItem('cart');
+        setCartItems([]);
       }
     }
   }, []);
@@ -44,7 +58,7 @@ const Checkout = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Kiểm tra form
@@ -53,14 +67,72 @@ const Checkout = () => {
       return;
     }
 
-    // Xử lý đặt hàng (ở đây có thể gọi API)
-    toast.success('Đặt hàng thành công!');
+    // Kiểm tra giỏ hàng
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+      toast.error('Giỏ hàng trống hoặc không hợp lệ');
+      return;
+    }
 
-    // Xóa giỏ hàng
-    // localStorage.removeItem('cart');
+    try {
+      // Chuẩn bị dữ liệu sản phẩm
+      const orderItems = cartItems.map(item => {
+        // Kiểm tra và lấy thông tin sản phẩm
+        if (!item || typeof item !== 'object') {
+          throw new Error('Dữ liệu sản phẩm không hợp lệ');
+        }
 
-    // Chuyển hướng đến trang cảm ơn
-    navigate('/order-success');
+        // Đảm bảo dữ liệu sản phẩm có đúng định dạng
+        const productData = {
+          product: item._id || item.productId || item.product?._id,
+          name: item.name || item.product?.name || '',
+          price: item.price || item.product?.price || 0,
+          quantity: item.quantity || 1,
+          thumbnail: item.thumbnail || item.product?.thumbnail || ''
+        };
+
+        // Kiểm tra các trường bắt buộc
+        if (!productData.product) {
+          throw new Error('Thiếu ID sản phẩm');
+        }
+
+        return productData;
+      });
+
+      // Tạo đơn hàng mới
+      const orderData = {
+        user: localStorage.getItem('userId'),
+        products: orderItems,
+        shippingInfo: {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city
+        },
+        paymentMethod: formData.paymentMethod,
+        totalAmount: totalPrice + 30000, // Tổng tiền + phí vận chuyển
+        status: 'pending'
+      };
+
+      console.log('Dữ liệu đơn hàng:', orderData); // Log để debug
+
+      const response = await api.post('/orders', orderData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.data) {
+        toast.success('Đặt hàng thành công!');
+        // Xóa giỏ hàng
+        localStorage.removeItem('cart');
+        // Chuyển hướng đến trang cảm ơn
+        navigate('/order-success');
+      }
+    } catch (error) {
+      console.error('Lỗi khi đặt hàng:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || 'Đặt hàng thất bại. Vui lòng thử lại!');
+    }
   };
 
   return (
