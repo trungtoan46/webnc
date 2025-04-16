@@ -11,7 +11,7 @@ const voucherRoutes = require('./voucher');
 const uploadRoutes = require('./images/api/upload');
 const paymentRoutes = require('./payment');
 const eventRoutes = require('./event');
-
+const orderRoutes = require('./order/index');
 // Mount routes
 router.use('/admin', adminRoutes);
 router.use('/auth', authRoutes); 
@@ -22,5 +22,5 @@ router.use('/vouchers', voucherRoutes);
 router.use('/images', uploadRoutes);
 router.use('/payment', paymentRoutes);
 router.use('/events', eventRoutes);
-
+router.use('/orders', orderRoutes);
 module.exports = router; 

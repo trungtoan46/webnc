@@ -14,6 +14,7 @@ const Login = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    console.log(email, password);
     try {
       await handleLogin(email, password);
       navigate("/");

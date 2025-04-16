@@ -64,40 +64,36 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Received login request:', { email }); // Log email only, not password
 
     // Validate input
     if (!email || !password) {
-      console.log('Missing email or password');
       return res.status(400).json({ message: 'Email và mật khẩu là bắt buộc' });
     }
 
-    // Find user
+    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('User not found:', email);
-      return res.status(400).json({ message: 'Email hoặc mật khẩu không chính xác' });
+      return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log('Password mismatch for user:', email);
-      return res.status(400).json({ message: 'Email hoặc mật khẩu không chính xác' });
+      return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
     }
 
     // Generate token
     const token = jwt.sign(
-      { userId: user._id, 
+      { 
+        userId: user._id,
         role: user.role,
         status: user.status
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '24h' }
     );
 
-    console.log('Login successful for user:', email);
-    res.json({
+    res.status(200).json({
       message: 'Đăng nhập thành công',
       token,
       user: {
@@ -110,7 +106,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Lỗi server khi đăng nhập' });
+    res.status(500).json({ message: 'Lỗi server' });
   }
 });
 

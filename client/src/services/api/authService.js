@@ -16,7 +16,7 @@ export const register = async (userData) => {
 // Đăng nhập và lưu token
 export const login = async (email, password) => {
   try {
-    console.log('Sending login data:', { email }); // Log email only, not password
+    console.log('Sending login data:', { email, password }); // Log email only, not password
     const response = await api.post("/auth/login", { email, password });
 
     // Kiểm tra response status
