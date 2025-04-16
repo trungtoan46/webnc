@@ -23,4 +23,5 @@ router.use('/images', uploadRoutes);
 router.use('/payment', paymentRoutes);
 router.use('/events', eventRoutes);
 router.use('/orders', orderRoutes);
+
 module.exports = router; 

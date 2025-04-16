@@ -20,6 +20,11 @@ import AddProduct from './pages/admin/AddProduct'
 import Products from './pages/Products'
 import Checkout from './pages/Checkout'
 import Test from './pages/test'
+import OrderSuccess from './pages/OrderSuccess'
+import Order from './pages/Order'
+import OrderDetail from './pages/OrderDetail'
+
+
 function App() {
   return (
     <ThemeProvider>
@@ -87,8 +92,23 @@ function App() {
                   </MainLayout>
                 } />
                 <Route path="/checkout" element={
-                  <MainLayout showHeader={false} showFooter={false}>
+                  <MainLayout showHeader={true} showFooter={true}>
                     <Checkout />
+                  </MainLayout>
+                } />
+                <Route path="/order-success" element={
+                  <MainLayout showHeader={true} showFooter={true}>
+                    <OrderSuccess />
+                  </MainLayout>
+                } />
+                <Route path="/orders" element={
+                  <MainLayout showHeader={true} showFooter={true}>
+                    <Order />
+                  </MainLayout>
+                } />
+                <Route path="/order/:id" element={
+                  <MainLayout showHeader={true} showFooter={true}>
+                    <OrderDetail />
                   </MainLayout>
                 } />
               </Routes>

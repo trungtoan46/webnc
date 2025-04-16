@@ -3,6 +3,6 @@ const router = express.Router();
 const orderRoutes = require('./api/order');
 
 // Mount order routes
-router.use('/api', orderRoutes);
+router.use('/', orderRoutes);
 
 module.exports = router;

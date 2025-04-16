@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const { uploadImages, removeImages } = require('../../../controller/upload');
+const { uploadImages, removeImages } = require('../../../controllers/upload');
 const cloudinary = require('../../../config/cloudinary');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
