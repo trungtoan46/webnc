@@ -1,29 +1,46 @@
 const cloudinary = require("../config/cloudinary");
 
 const uploadImages = async (req, res) => {
+  console.log("req.files:", req.files);
   try {
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "Không có file nào được tải lên" } );
+      return res.status(400).json({ 
+        success: false,
+        message: "Không có file nào được tải lên" 
+      });
     }
 
     const results = await Promise.all(req.files.map(async (file) => {
-      return await cloudinary.uploader.upload(file.path, {
+      // Tạo data URI từ buffer
+      const dataUri = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      
+      // Upload lên Cloudinary
+      const result = await cloudinary.uploader.upload(dataUri, {
         folder: "products",
         resource_type: "auto",
       });
+      
+      return {
+        url: result.secure_url,
+        public_id: result.public_id
+      };
     }));
 
     res.json({
       success: true,
-      urls: results.map(result => result.secure_url),
+      urls: results.map(result => result.url),
+      public_ids: results.map(result => result.public_id),
       message: "Upload ảnh thành công"
     });
   } catch (error) {
     console.error("Lỗi upload:", error);
-    res.status(500).json({ message: "Lỗi khi tải ảnh lên" });
+    res.status(500).json({ 
+      success: false,
+      message: "Lỗi khi tải ảnh lên",
+      error: error.message 
+    });
   }
 };
-
 
 const removeImages = async (req, res) => {
   try {
@@ -36,8 +53,6 @@ const removeImages = async (req, res) => {
       });
     }
     
-    console.log("Đang xóa ảnh với public_id:", public_id);
-    
     const result = await cloudinary.uploader.destroy(public_id);
     
     if(result.result === "ok"){
@@ -45,21 +60,20 @@ const removeImages = async (req, res) => {
         success: true,
         message: "Xóa ảnh thành công",
       });
-    }
-    else{
+    } else {
       throw new Error("Xóa ảnh thất bại");
     }
-  } catch(error){
+  } catch (error) {
     console.error("Lỗi xóa ảnh:", error);
     res.status(500).json({ 
       success: false,
       message: "Lỗi khi xóa ảnh",
-      error: error.message
+      error: error.message 
     });
   }
-}
+};
 
 module.exports = {
   uploadImages,
-  removeImages,
+  removeImages
 };

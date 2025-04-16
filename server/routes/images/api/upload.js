@@ -2,38 +2,54 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const { uploadImage } = require('../../../controller/upload');
+const { uploadImages, removeImages } = require('../../../controller/upload');
 const cloudinary = require('../../../config/cloudinary');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const { uploadImages, removeImages } = require('../../../controller/upload');
 
 // Cấu hình storage
-const routerImages = express.Router();
-
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'uploads',
+    folder: 'products',
     format: 'jpg, png, jpeg, webp',
     resource_type: 'auto'
-  },
-});
-
-const upload = multer({storage: storage});
-
-routerImages.post('/upload', upload.array("images",10), uploadImages, async (req, res) => {
-  try {
-    const uploadedImages = req.files.map(file => file.path);
-    res.json({
-      success: true,
-      images: uploadedImages
-    });
-  } catch (error) {
-    console.error("Lỗi upload:", error);
-    res.status(500).json({ message: "Lỗi khi tải ảnh lên" });
   }
 });
-routerImages.post('/remove', removeImages)
+
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Loại file không được hỗ trợ'), false);
+    }
+  }
+});
+
+// Route upload ảnh
+router.post('/upload', upload.array('images', 10), uploadImages);
+
+
+const detailStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'products/detail',
+    format: 'jpg, png, jpeg, webp',
+    resource_type: 'auto'
+  }
+});
+
+const detailUpload = multer({ storage: detailStorage });
+
+router.post('/upload-detail', detailUpload.array('images', 10), uploadImages);
+
+// Route xóa ảnh
+router.post('/remove', removeImages);
 
 // Cấu hình storage riêng cho event
 const eventStorage = new CloudinaryStorage({
@@ -47,7 +63,7 @@ const eventStorage = new CloudinaryStorage({
 const uploadEvent = multer({ storage: eventStorage });
 
 // Route upload ảnh event (chỉ 1 ảnh)
-routerImages.post('/upload-event', uploadEvent.single("image"), async (req, res) => {
+router.post('/upload-event', uploadEvent.single("image"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "Không có ảnh nào được tải lên" });
@@ -62,8 +78,5 @@ routerImages.post('/upload-event', uploadEvent.single("image"), async (req, res)
   }
 });
 
-
-
-
-module.exports = routerImages;    
+module.exports = router;    
  

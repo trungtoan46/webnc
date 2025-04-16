@@ -113,30 +113,58 @@ const AddProduct = ({ onCancel }) => {
     }
 
     setLoading(true);
-    
+    console.log("thumbnail:", thumbnail);
+    console.log(thumbnail instanceof File); // true
+
+    console.log("detailImages:", detailImages);
     try {
       // Xử lý tải lên hình ảnh trước khi tạo sản phẩm
       let finalThumbnail = null;
       let detail_images = [];
       
       // Tải lên thumbnail
-      if (thumbnail) {
-        const thumbnailFormData = new FormData();
-        thumbnailFormData.append('images', thumbnail);
-        
-        const thumbnailResponse = await api.post('/images/upload', thumbnailFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+      if (thumbnail && thumbnail instanceof File) {
+        try {
+          // Kiểm tra file có hợp lệ không
+          if (thumbnail.size === 0) {
+            throw new Error('File rỗng');
           }
-        });
-        
-        if (thumbnailResponse.data.urls && thumbnailResponse.data.urls.length > 0) {
+          if (!thumbnail.type.startsWith('image/')) {
+            throw new Error('File không phải là hình ảnh');
+          }
+
+          const thumbnailFormData = new FormData();
+          // Sử dụng Blob để đảm bảo dữ liệu file được giữ nguyên
+          const blob = new Blob([thumbnail], { type: thumbnail.type });
+          thumbnailFormData.append('images', blob, thumbnail.name);
+          
+          // Kiểm tra FormData trước khi gửi
+          for (let [key, value] of thumbnailFormData.entries()) {
+            console.log(`${key}:`, value instanceof Blob ? `Blob(${value.size} bytes)` : value);
+          }
+          
+          const thumbnailResponse = await api.post('/images/upload', thumbnailFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Accept': 'application/json'
+            }
+          });
+          
+          console.log("thumbnailResponse:", thumbnailResponse);
+          
+          if (!thumbnailResponse.data || !thumbnailResponse.data.urls || thumbnailResponse.data.urls.length === 0) {
+            throw new Error('Không nhận được URL ảnh từ server');
+          }
+          
           finalThumbnail = thumbnailResponse.data.urls[0];
-        } else {
-          throw new Error('Không thể tải lên ảnh đại diện');
+        } catch (error) {
+          console.error('Error uploading thumbnail:', error);
+          toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải lên ảnh đại diện');
+          return;
         }
       }
-      
+      console.log("finalThumbnail:", finalThumbnail);
+
       // Tải lên ảnh chi tiết (nếu có)
       if (detailImages.length > 0) {
         // Tạo FormData để tải lên nhiều ảnh
@@ -144,13 +172,14 @@ const AddProduct = ({ onCancel }) => {
         detailImages.forEach(img => {
           imageFormData.append('images', img);
         });
-        
+        console.log("imageFormData:", imageFormData);
         // Gọi API upload ảnh
         const uploadResponse = await api.post('/images/upload', imageFormData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
+        console.log("uploadResponse:", uploadResponse);
         
         // Lấy URL của ảnh đã tải lên
         if (uploadResponse.data.urls && uploadResponse.data.urls.length > 0) {
@@ -181,7 +210,8 @@ const AddProduct = ({ onCancel }) => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
+
+      console.log("productData:", productData);
       toast.success('Thêm sản phẩm thành công!');
       
       // Reset form
