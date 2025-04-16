@@ -178,7 +178,8 @@ const Order = () => {
                         </div>
                         <div className="text-right">
                           <Link
-                            to={`/orders/${order._id}`}
+                            to={`/orderdetail`}
+                            state={{ orderId: order._id }}
                             className="text-sm font-medium text-blue-600 hover:text-blue-500"
                           >
                             Xem chi tiết

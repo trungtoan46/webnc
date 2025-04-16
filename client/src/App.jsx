@@ -106,7 +106,7 @@ function App() {
                     <Order />
                   </MainLayout>
                 } />
-                <Route path="/order/:id" element={
+                <Route path="/orderdetail" element={
                   <MainLayout showHeader={true} showFooter={true}>
                     <OrderDetail />
                   </MainLayout>

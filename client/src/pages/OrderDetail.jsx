@@ -3,20 +3,22 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../services/api/api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router-dom';
 
 const OrderDetail = () => {
-  const { id } = useParams();
+  const location = useLocation();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchOrderDetail();
-  }, [id]);
+  const { orderId } = location.state || {};
 
   const fetchOrderDetail = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/orders/${id}`);
+      const response = await api.get(`/orders/${orderId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       setOrder(response.data);
     } catch (error) {
       console.error('Error fetching order detail:', error);
@@ -25,6 +27,12 @@ const OrderDetail = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (orderId) {
+      fetchOrderDetail();
+    }
+  }, [orderId]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -114,7 +122,7 @@ const OrderDetail = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">
-                  Đơn hàng #{order.orderNumber}
+                  Đơn hàng #{order._id}
                 </h2>
                 <p className="text-sm text-gray-500">
                   Ngày đặt: {formatDate(order.createdAt)}
@@ -133,10 +141,11 @@ const OrderDetail = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Thông tin giao hàng</h3>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-900 font-medium">{order.shippingAddress.name}</p>
-                  <p className="text-sm text-gray-500">{order.shippingAddress.phone}</p>
+                  <p className="text-sm text-gray-900 font-medium">{order.shippingInfo.fullName}</p>
+                  <p className="text-sm text-gray-500">{order.shippingInfo.phone}</p>
+                  <p className="text-sm text-gray-500">{order.shippingInfo.email}</p>
                   <p className="text-sm text-gray-500 mt-2">
-                    {order.shippingAddress.address}, {order.shippingAddress.ward}, {order.shippingAddress.district}, {order.shippingAddress.province}
+                    {order.shippingInfo.address}, {order.shippingInfo.city}
                   </p>
                 </div>
               </div>
@@ -149,7 +158,7 @@ const OrderDetail = () => {
                     Phương thức thanh toán: {order.paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản'}
                   </p>
                   <p className="text-sm text-gray-500 mt-2">
-                    Trạng thái thanh toán: {order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                    Trạng thái: {getStatusText(order.status)}
                   </p>
                 </div>
               </div>
@@ -177,7 +186,7 @@ const OrderDetail = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {order.items.map((item) => (
+                    {order.products.map((item) => (
                       <tr key={item._id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -190,9 +199,11 @@ const OrderDetail = () => {
                               <p className="text-sm font-medium text-gray-900">
                                 {item.product.name}
                               </p>
-                              <p className="text-sm text-gray-500">
-                                {item.color} / {item.size}
-                              </p>
+                              {item.product.variants && item.product.variants.length > 0 && (
+                                <p className="text-sm text-gray-500">
+                                  {item.product.variants[0].size} / {item.product.variants[0].color}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -214,17 +225,9 @@ const OrderDetail = () => {
 
             {/* Order Summary */}
             <div className="mt-8 bg-gray-50 rounded-lg p-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-sm text-gray-500">Tạm tính</span>
-                <span className="text-sm text-gray-900">{formatPrice(order.subtotal)}</span>
-              </div>
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-sm text-gray-500">Phí vận chuyển</span>
-                <span className="text-sm text-gray-900">{formatPrice(order.shippingFee)}</span>
-              </div>
               <div className="flex justify-between items-center border-t border-gray-200 pt-4">
                 <span className="text-lg font-medium text-gray-900">Tổng cộng</span>
-                <span className="text-lg font-medium text-gray-900">{formatPrice(order.total)}</span>
+                <span className="text-lg font-medium text-gray-900">{formatPrice(order.totalAmount)}</span>
               </div>
             </div>
           </div>
