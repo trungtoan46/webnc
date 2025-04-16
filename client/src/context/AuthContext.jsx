@@ -1,74 +1,101 @@
-import { createContext, useState, useEffect } from "react";
-import { login, logout, getCurrentUser, isAuthenticated, register } from "../services/api/authService";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
+import api from '../services/api/api';
 
-export const AuthContext = createContext();   
+export const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
+    const checkAuth = async () => {
       try {
-        if (isAuthenticated()) {
-          const userData = await getCurrentUser();
-          setUser(userData);
+        const token = localStorage.getItem('token');
+        if (token) {
+          const response = await api.get('/auth/me', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUser(response.data);
         }
       } catch (error) {
-        console.error("Error initializing auth:", error);
-        logout();
+        console.error('Auth check failed:', error);
+        localStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
     };
 
-    initAuth();
+    checkAuth();
   }, []);
 
-  // Đăng ký tài khoản
-  const handleRegister = async (userData) => {
+  const login = async (email, password) => {
     try {
-      const response = await register(userData);
-      return response;
+        const response = await api.post('/auth/login', { email, password });
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      setUser(user);
+      return { success: true };
     } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Đăng nhập thất bại'
+      };
     }
   };
 
-  // Đăng nhập
-  const handleLogin = async (email, password) => {
+  const register = async (username, email, password) => {
     try {
-      const response = await login(email, password);
-      const userData = await getCurrentUser();
-      setUser(userData);
-      return response;
+      const response = await api.post('/auth/register', {
+        username,
+        email,
+        password
+      });
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      setUser(user);
+      return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
-      // Đảm bảo luôn throw Error object với message rõ ràng
-      if (error instanceof Error) {
-        throw error;
-      } else {
-        throw new Error(typeof error === 'string' ? error : 'Đăng nhập thất bại! Vui lòng thử lại.');
-      }
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Đăng ký thất bại'
+      };
     }
   };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('token');
     setUser(null);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const updateUserProfile = async (profileData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.put('/auth/profile', profileData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(response.data);
+      return { success: true };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Cập nhật thông tin thất bại');
+    }
+  };
+
+  const value = {
+    user,
+    loading,
+    login,
+    register,
+    handleLogout,
+    updateUserProfile
+  };
 
   return (
-    <AuthContext.Provider value={{ user, handleLogin, handleLogout, handleRegister }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
-
-export default AuthProvider;
 

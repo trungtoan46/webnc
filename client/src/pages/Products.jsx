@@ -148,7 +148,6 @@ const Products = () => {
       alert('Failed to add product to cart. Please try again.');
     }
   };
-  console.log("products:", products); 
   
 
     return (

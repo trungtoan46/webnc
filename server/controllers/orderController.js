@@ -91,7 +91,6 @@ exports.getOrderById = async (req, res) => {
     }
 
     res.status(200).json({
-      success: true,
       order
     });
   } catch (error) {

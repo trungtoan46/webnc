@@ -10,7 +10,7 @@ import './App.css'
 import './index.css'
 import Admin from './pages/Admin'
 import ProtectedRoute from './components/common/ProtectedRoute';
-import AuthProvider  from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -23,7 +23,9 @@ import Test from './pages/test'
 import OrderSuccess from './pages/OrderSuccess'
 import Order from './pages/Order'
 import OrderDetail from './pages/OrderDetail'
-
+import CheckOrder from './pages/CheckOrder'
+import Profile from './pages/profile/Profile'
+import EditProfile from './pages/EditProfile'
 
 function App() {
   return (
@@ -109,6 +111,21 @@ function App() {
                 <Route path="/orderdetail" element={
                   <MainLayout showHeader={true} showFooter={true}>
                     <OrderDetail />
+                  </MainLayout>
+                } />
+                <Route path="/checkorder" element={
+                  <MainLayout showHeader={true} showFooter={true}>
+                    <CheckOrder />
+                  </MainLayout>
+                } />
+                <Route path="/profile" element={
+                  <MainLayout showHeader={true} showFooter={true}>
+                    <Profile />
+                  </MainLayout>
+                } />
+                <Route path="/profile/edit" element={
+                  <MainLayout showHeader={true} showFooter={true}>
+                    <EditProfile />
                   </MainLayout>
                 } />
               </Routes>

@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../../../models/index.model');
+const {isAuthenticated} = require('../../../middleware/auth');
 
 // Register
 router.post('/register', async (req, res) => {
@@ -143,6 +144,33 @@ router.get('/me', async (req, res) => {
       return res.status(401).json({ message: 'Token không hợp lệ' });
     }
     res.status(500).json({ message: 'Lỗi server khi lấy thông tin người dùng' });
+  }
+});
+
+// Update user profile
+router.put('/profile', isAuthenticated, async (req, res) => {
+  try {
+    const { username, email, phone, address } = req.body;
+    // Check if user exists
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+    }
+
+    // Update user fields
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
+    if (address) user.address = address;
+
+    const updatedUser = await user.save();
+
+    // Return updated user data without password
+    const { password: _, ...userWithoutPassword } = updatedUser.toObject();
+    res.status(200).json(userWithoutPassword);
+  } catch (error) {
+    console.error('Update user error:', error);
+    res.status(500).json({ message: 'Lỗi server khi cập nhật thông tin người dùng' });
   }
 });
 
