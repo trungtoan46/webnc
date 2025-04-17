@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { useCart } from '../../context/CartContext';
 import AnimedNumber from '../common/AnimedNumber';
-const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize }) => {
-  const [quantity, setQuantity] = useState(1);
+const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize, quantity, setQuantity }) => {
   const code = promoCode ? promoCode : 'EGAFREESHIP';
   const { addToCart } = useCart();
   const handleCopy = () => {
@@ -43,6 +42,7 @@ const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize 
   };
   
   const handleQuantityChange = (value) => {
+    
     if (typeof value === 'number') {
       const newQuantity = quantity + value;
       if (newQuantity > 0) {
@@ -98,7 +98,7 @@ const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize 
         <div className='flex items-center gap-10 mt-4'>
           <div className='w-4/12 flex items-center gap-0 h-full border-2 border-gray-500 rounded-md'>
             <div className='w-full h-10 rounded-md items-center justify-center flex'>
-            <AnimedNumber value={quantity} onChange={setQuantity} min={0} max={1000000000} />
+            <AnimedNumber value={quantity} onChange={handleQuantityChange} min={1} max={product.stock} />
             </div>
           </div>
           <button 

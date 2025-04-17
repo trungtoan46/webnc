@@ -6,6 +6,8 @@ import Slide from '../components/home/Slide';
 import ProductCollection from '../components/products/ProductCollection';
 import FlashSale from '../components/home/FlashSale';
 import CouponSection from '../components/products/CouponSection';
+import ProductGrid from '../components/products/ProductGrid';
+import { products } from '../data/products';
 
 const Home = () => {
   const categories = [
@@ -39,6 +41,7 @@ const Home = () => {
     <div className='w-full'>
       <div className="flex-1">
         <FlashSale />
+        <ProductGrid products={products} />
         <ProductCollection categories={categories} />
         <CouponSection />
       </div>

@@ -7,7 +7,7 @@ import useClickOutside  from '../../hooks/useClickOutside';
 const PopupDetail = ({ product, onClose }) => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-
+  const [quantity, setQuantity] = useState(1);
 
   const ref = useClickOutside(() => {
     onClose();
@@ -19,7 +19,7 @@ const PopupDetail = ({ product, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div 
       ref={ref}
-      className="bg-white rounded-lg w-full max-w-4xl relative max-h-[7000px] overflow-y-auto mb-10">
+      className="bg-white rounded-lg w-full max-w-4xl relative max-h-[700px] overflow-y-auto m-10">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -37,10 +37,13 @@ const PopupDetail = ({ product, onClose }) => {
               onSizeChange={setSelectedSize}
               selectedColor={selectedColor}
               selectedSize={selectedSize}
+              quantity={quantity}
             />
             <PromotionBox 
               product={product} 
               isCart={true}
+              quantity={quantity}
+              setQuantity={setQuantity}
               selectedColor={selectedColor}
               selectedSize={selectedSize}
             />

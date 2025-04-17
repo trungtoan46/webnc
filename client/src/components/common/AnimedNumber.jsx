@@ -5,8 +5,8 @@ import React from 'react'
 
 export default function AnimedNumber({ 
 	value = 0, 
-	min = -Infinity, 
-	max = Infinity, 
+	min = 0, 
+	max = 1000, 
 	onChange,
 }) {
 	const defaultValue = React.useRef(value)
@@ -33,7 +33,7 @@ export default function AnimedNumber({
 			event?.preventDefault()
 			inputRef.current?.focus()
 		}
-		const newVal = Math.min(Math.max(value + diff, min), max)
+		const newVal =  + diff
 		onChange?.(newVal)
 	}
 

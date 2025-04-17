@@ -1,12 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onColorChange }) => {
+const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onColorChange, quantity }) => {
   
   const formatPrice = (price) => {
+    if (!price || isNaN(price)) return '0đ';
     return price.toLocaleString() + 'đ';
   };
 
-  const discount = product.discount ? product.discount : 0;
+  // Ensure all price calculations use valid numbers
+  const calculatePrices = () => {
+    const basePrice = Number(product.price) || 0;
+    const saleDiscount = Number(product.sale_price) || 0;
+    const qty = Number(quantity) || 1;
+
+    const discountedPrice = basePrice * (1 - saleDiscount / 100);
+    const total = discountedPrice * qty;
+
+    return {
+      basePrice,
+      discountedPrice,
+      total
+    };
+  };
+
+  const { basePrice, discountedPrice, total } = calculatePrices();
+
+  // Log values for debugging
+  useEffect(() => {
+    console.log('Price calculations:', {
+      price: product.price,
+      sale_price: product.sale_price,
+      quantity,
+      discountedPrice,
+      total
+    });
+  }, [product.price, product.sale_price, quantity, discountedPrice, total]);
 
   const ColorVN ={
     'White': 'Trắng',
@@ -14,6 +42,14 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
     'Blue': 'Xanh',
     'Red': 'Đỏ',
     'Yellow': 'Vàng',
+    'Green': 'Xanh lá',
+    'Brown': 'Nâu',
+    'Pink': 'Hồng',
+    'Purple': 'Tím',
+    'Orange': 'Cam',
+    'Gray': 'Xám',
+    'Gold': 'Vàng',
+    'Silver': 'Bạc',
   }
 
   const handleSizeChange = (size) => {
@@ -24,21 +60,39 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
     onColorChange(color);
   };  
 
- 
-
   // Đảm bảo luôn có một mảng để map
-  const colors = Array.isArray(product.color)
-    ? product.color
-    : typeof product.color === 'string'
-    ? [product.color]
+  const colors = Array.isArray(product.variants)
+    ? [...new Set(product.variants.map(variant => variant.color))]
+    : typeof product.variants === 'string'
+    ? [product.variants]
     : [];
 
-  const sizes = Array.isArray(product.size)
-    ? product.size
-    : typeof product.size === 'string'
-    ? [product.size]
+  const sizes = Array.isArray(product.variants)
+    ? [...new Set(product.variants.map(variant => variant.size))]
+    : typeof product.variants === 'string'
+    ? [product.variants]
     : [];
 
+  // Tính số lượng hàng còn lại cho variant được chọn
+  const getSelectedVariantStock = () => {
+    if (!selectedColor || !selectedSize || !Array.isArray(product.variants)) return 0;
+    
+    const selectedVariant = product.variants.find(
+      variant => variant.color === selectedColor && variant.size === selectedSize
+    );
+    
+    return selectedVariant ? selectedVariant.stock : 0;
+  };
+
+  // Tính tổng số lượng hàng còn lại
+  const getTotalStock = () => {
+    if (!Array.isArray(product.variants)) return 0;
+    return product.variants.reduce((total, variant) => total + variant.stock, 0);
+  };
+
+  const currentStock = getSelectedVariantStock();
+  const totalStock = getTotalStock();
+  
   return (
     <div className="md:w-full">
       <h2 className="text-xl font-bold  text-gray-700 text-left">{product.name}</h2>
@@ -53,28 +107,43 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
 
       <div className="flex items-center gap-4 mb-6">
         <span className="text-2xl font-bold text-blue-600">
-          {formatPrice(product.price * (1 - discount / 100))}
+          {formatPrice(discountedPrice)}
         </span>
-        {product.discount > 0 && (
+        {product.sale_price > 0 && (
           <>
             <span className="text-gray-500 line-through">
-              {formatPrice(product.price)}
+              {formatPrice(basePrice)}
             </span>
             <span className="bg-red-500 text-white px-2 py-1 rounded-md text-sm">
-              -{product.discount}%
+              -{product.sale_price}%
             </span>
           </>
         )}
       </div>
 
+      {/* Stock Information */}
+      <div className="mb-4">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-gray-600">Tổng kho:</span>
+          <span className="font-medium">{totalStock} sản phẩm</span>
+        </div>
+        {selectedSize && selectedColor && (
+          <div className="flex items-center gap-2 text-sm mt-1">
+            <span className="text-gray-600">Còn lại:</span>
+            <span className={`font-medium ${currentStock < 10 ? 'text-red-500' : 'text-green-500'}`}>
+              {currentStock} sản phẩm
+            </span>
+          </div>
+        )}
+      </div>
+
       {/* Sizes */}
-      <div className="mb-2 ">
-          <h3 className="text-gray-700 mb-2 text-sm text-left">Kích thước:</h3>
-          <div className="flex gap-2 relative  ">
-            {sizes.map((size, index) => (
-              <div className='relative overflow-hidden'>
-                  <button
-                key={index}
+      <div className="mb-2">
+        <h3 className="text-gray-700 mb-2 text-sm text-left">Kích thước:</h3>
+        <div className="flex gap-2 relative">
+          {sizes.map((size, index) => (
+            <div key={index} className='relative overflow-hidden'>
+              <button
                 type="button"
                 value={size}
                 onClick={() => handleSizeChange(size)}
@@ -84,25 +153,19 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
               >
                 {size}
               </button>
-                  <div className={`absolute -top-6 -right-[22px] bg-black rounded-full
-                  w-10 h-10 flex items-center justify-center transition-opacity
-                  rotate-[90deg]
-                   
-                  ${selectedSize === size ? 'opacity-100' : 'opacity-0'}`}>
-                  <img src="/src/assets/done.png" alt="Done" 
-                  className='w-2 h-2 bg-black rounded -rotate-90 absolute
-                  left-[26px] bottom-[9px]' />
-                
-                  
-                  </div>
+              <div className={`absolute -top-6 -right-[22px] bg-black rounded-full
+                w-10 h-10 flex items-center justify-center transition-opacity
+                rotate-[90deg] ${selectedSize === size ? 'opacity-100' : 'opacity-0'}`}>
+                <img 
+                  src="/src/assets/done.png" 
+                  alt="Done" 
+                  className='w-2 h-2 bg-black rounded -rotate-90 absolute left-[26px] bottom-[9px]' 
+                />
               </div>
-              
-              
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-
-
+      </div>
 
       {/* Colors */}
       {colors.length > 0 && (
@@ -121,15 +184,11 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
                   `}
                   style={{ backgroundColor: color.toLowerCase() }}
                 />
-
-                {/* Tooltip */}
                 <span className="absolute -top-8 -left-3 bg-black text-white text-[12px] font-semibold
                   px-2 py-1 rounded-md opacity-0 group-hover:opacity-100
                   whitespace-nowrap z-10">
                   {ColorVN[color]}
                 </span>
-
-                {/* Arrow below tooltip */}
                 <div className="absolute -top-3 left-3 w-2 h-2 
                   bg-black rotate-45 opacity-0 group-hover:opacity-100">
                 </div>
@@ -139,9 +198,25 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
         </div>
       )}
 
-
-      
-  
+      {/* Total Price */}
+      {selectedSize && selectedColor && (
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700">Tổng tiền:</span>
+            <span className="text-xl font-bold text-blue-600">{formatPrice(total)}</span>
+          </div>
+          {currentStock < 10 && currentStock > 0 && (
+            <div className="mt-2 text-red-500 text-sm">
+              Chỉ còn {currentStock} sản phẩm - Mua ngay!
+            </div>
+          )}
+          {currentStock === 0 && (
+            <div className="mt-2 text-red-500 text-sm font-medium">
+              Hết hàng
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
