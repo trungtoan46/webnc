@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const http = require('http');
@@ -56,13 +57,18 @@ app.use(express.json());
 app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI, 
+    ttl: 14 * 24 * 60 * 60 // 14 ngày
+  }),
   cookie: { 
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 1 month
+    maxAge: 30 * 24 * 60 * 60 * 1000,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }));
+
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
