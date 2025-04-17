@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['http://localhost:3003', 'http://localhost:5173']
+      ? ['http://localhost:3003', 'http://localhost:5173', 'https://fontend-webnc-qsbsybktq-trungtoan46s-projects.vercel.app']
       : true,
     methods: ['GET', 'POST'],
     credentials: true
@@ -41,7 +41,7 @@ connectDB();
 // CORS configuration - Must be before other middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['http://localhost:3003', 'http://localhost:5173']
+    ? ['http://localhost:3003', 'http://localhost:5173', 'https://fontend-webnc-qsbsybktq-trungtoan46s-projects.vercel.app']
     : true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
