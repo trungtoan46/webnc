@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['http://localhost:3003', 'http://localhost:5173', 'https://fontend-webnc-qsbsybktq-trungtoan46s-projects.vercel.app']
+      ? ['http://localhost:3003', 'http://localhost:5173', 'https://fontend-webnc-qsbsybktq-trungtoan46s-projects.vercel.app', 'https://egamen.vercel.app']
       : true,
     methods: ['GET', 'POST'],
     credentials: true
@@ -41,7 +41,8 @@ connectDB();
 // CORS configuration - Must be before other middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['http://localhost:3003', 'http://localhost:5173', 'https://fontend-webnc-qsbsybktq-trungtoan46s-projects.vercel.app']
+    ? ['http://localhost:3003', 'http://localhost:5173',
+     'https://fontend-webnc-qsbsybktq-trungtoan46s-projects.vercel.app', 'https://egamen.vercel.app']
     : true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -55,20 +56,28 @@ app.use(express.json());
 
 // Session middleware
 app.use(session({
-  secret: process.env.JWT_SECRET,
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI, 
-    ttl: 14 * 24 * 60 * 60 // 14 ngày
+    mongoUrl: process.env.MONGODB_URI,
+    ttl: 30 * 24 * 60 * 60 // 30 days
   }),
-  cookie: { 
-    maxAge: 30 * 24 * 60 * 60 * 1000,
+  cookie: {
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-  }
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days in milliseconds
+  },
+  name: 'sessionId' // Custom cookie name
 }));
 
+// Add this after session middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));

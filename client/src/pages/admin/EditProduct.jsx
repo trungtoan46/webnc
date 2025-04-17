@@ -11,16 +11,23 @@ import convertToVietnameseSlug  from '../../hooks/convertToVietnameseSlug';
 const EditProduct = ({ productId, onCancel }) => {
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
+    sale_price: '',
     category_id: '',
     status: 'active',
     tags: []
   });
-  const [sizes, setSizes] = useState(['S', 'M', 'L', 'XL']);
-  const [colors, setColors] = useState(['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Black', 'White']);
+  
+  // Định nghĩa các size và màu mặc định
+  const defaultSizes = ['S', 'M', 'L', 'XL'];
+  const defaultColors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Black', 'White'];
+  
+  const [sizes, setSizes] = useState(defaultSizes);
+  const [colors, setColors] = useState(defaultColors);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [variants, setVariants] = useState([]);
@@ -28,38 +35,65 @@ const EditProduct = ({ productId, onCancel }) => {
   const [detailImages, setDetailImages] = useState([]);
 
   useEffect(() => {
+    fetchCategories();
     fetchProduct();
   }, [productId]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      toast.error('Không thể tải danh sách danh mục');
+    }
+  };
 
   const fetchProduct = async () => {
     try {
       const response = await api.get(`/products/${productId}`);
       const productData = response.data;
+      
+      // Lưu toàn bộ dữ liệu sản phẩm
       setProduct(productData);
+      
+      // Cập nhật form data
       setFormData({
         name: productData.name || '',
         description: productData.description || '',
-        price: productData.price || '',
+        price: productData.price?.toString() || '',
+        sale_price: productData.sale_price?.toString() || '',
         category_id: productData.category_id || '',
         status: productData.status || 'active',
         tags: productData.tags || []
       });
-      
-      setVariants(productData.variants || []);
-      setSizes(['S', 'M', 'L', 'XL']);
-      setColors(['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Black', 'White']);
 
-      setThumbnail(productData.thumbnail);
+      // Cập nhật hình ảnh
+      setThumbnail(productData.thumbnail || null);
       setDetailImages(productData.detail_images || []);
 
-      const fetchedVariants = productData.variants || [];
-      setVariants(fetchedVariants);
+      // Xử lý variants
+      const productVariants = productData.variants || [];
+      
+      // Lấy sizes và colors từ variants của sản phẩm
+      const productSizes = [...new Set(productVariants.map(v => v.size))];
+      const productColors = [...new Set(productVariants.map(v => v.color))];
+      
+      // Cập nhật selected sizes và colors
+      setSelectedSizes(productSizes);
+      setSelectedColors(productColors);
+      
+      // Cập nhật variants với số lượng
+      const variantsWithQuantity = productVariants.map(v => ({
+        size: v.size,
+        color: v.color,
+        quantity: v.stock || 0
+      }));
+      setVariants(variantsWithQuantity);
 
-      // Get unique sizes and colors from variants
-      const fetchedSizes = [...new Set(fetchedVariants.map(v => v.size))];
-      const fetchedColors = [...new Set(fetchedVariants.map(v => v.color))];
-      setSelectedSizes(fetchedSizes);
-      setSelectedColors(fetchedColors);
+      // Merge sizes và colors từ sản phẩm với danh sách mặc định
+      setSizes([...new Set([...defaultSizes, ...productSizes])]);
+      setColors([...new Set([...defaultColors, ...productColors])]);
 
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -118,6 +152,13 @@ const EditProduct = ({ productId, onCancel }) => {
       toast.error('Vui lòng điền đầy đủ thông tin bắt buộc');
       return;
     }
+
+    // Validate sale price
+    if (formData.sale_price && Number(formData.sale_price) >= Number(formData.price)) {
+      toast.error('Giá khuyến mãi phải nhỏ hơn giá gốc');
+      return;
+    }
+
     console.log("category_id:", formData.category_id);
     console.log("name:", formData.name);
     try {
@@ -179,7 +220,8 @@ const EditProduct = ({ productId, onCancel }) => {
         tags: formData.tags || [],
         category_id: formData.category_id,
         thumbnail: finalThumbnail,
-        detail_images: detail_images
+        detail_images: detail_images,
+        sale_price: formData.sale_price || null
       };
       
       console.log("productData:", productData);
@@ -237,6 +279,7 @@ const EditProduct = ({ productId, onCancel }) => {
               <div className=" space-y-6">
                 <ProductForm
                   formData={formData}
+                  categories={categories}
                   handleChange={handleInputChange}
                   handleThumbnailChange={setThumbnail}
                   handleDetailImagesChange={setDetailImages}

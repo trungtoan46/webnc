@@ -42,7 +42,7 @@ const AdminEvent = () => {
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/events`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -75,7 +75,7 @@ const AdminEvent = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/products`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -198,7 +198,7 @@ const AdminEvent = () => {
   const handleLinkProducts = async () => {
     setIsLoading(true);
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events/${selectedEvent._id}/products`, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/events/${selectedEvent._id}/products`, {
         products: selectedProducts
       }, {
         headers: {
@@ -238,7 +238,7 @@ const AdminEvent = () => {
           }
           
           
-          const uploadResponse = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/images/upload-event`, formDataImage, {
+          const uploadResponse = await axios.post(`${import.meta.env.VITE_API_URL}/images/upload-event`, formDataImage, {
             headers: {
               'Content-Type': 'multipart/form-data',
               'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -265,7 +265,7 @@ const AdminEvent = () => {
       let response;
       if (selectedEvent) {
         // Cập nhật sự kiện
-        response = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events/${selectedEvent._id}`, eventData, {
+        response = await axios.put(`${import.meta.env.VITE_API_URL}/events/${selectedEvent._id}`, eventData, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -277,7 +277,7 @@ const AdminEvent = () => {
         ));
       } else {
         // Tạo sự kiện mới
-        response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/events`, eventData, {
+        response = await axios.post(`${import.meta.env.VITE_API_URL}/events`, eventData, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -310,7 +310,7 @@ const AdminEvent = () => {
     setIsLoading(true);
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/events/${selectedEvent._id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/events/${selectedEvent._id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

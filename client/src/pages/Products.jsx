@@ -4,7 +4,7 @@ import './Products.css';
 import PopupDetail from '../components/ui/Popup_Detail';
 import FilterSidebar from '../components/ui/FilterSidebar';
 import ProductGrid from '../components/ui/ProductGrid';
-import { addToCart, getProductsWithPagination, getEvents } from '../services/api/api';
+import { addToCart, getEvents } from '../services/api/api';
 
 const Products = () => {
   const [products, setProducts] = useState([]);

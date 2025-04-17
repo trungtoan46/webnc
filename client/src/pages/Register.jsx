@@ -7,7 +7,7 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { handleRegister } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [username, setUsername] = useState("");
@@ -20,7 +20,7 @@ const Register = () => {
       return;
     }
     try {
-      await handleRegister({ email, password, username });
+      await register({ email, password, username });
       navigate("/login");
     } catch (error) {
       console.error("Lỗi đăng ký:", error);

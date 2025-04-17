@@ -33,9 +33,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-        const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
       const { token, user } = response.data;
       localStorage.setItem('token', token);
+      console.log(token);
       setUser(user);
       return { success: true };
     } catch (error) {
@@ -46,18 +47,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (userData) => {
+    console.log("Username:", userData.username);
+    console.log("Email:", userData.email);
+    console.log("Password:", userData.password);
+
     try {
       const response = await api.post('/auth/register', {
-        username,
-        email,
-        password
+        username: userData.username,
+        email: userData.email,
+        password: userData.password
       });
+
+      console.log(response.data);
       const { token, user } = response.data;
+
       localStorage.setItem('token', token);
       setUser(user);
+
       return { success: true };
     } catch (error) {
+      console.error('Registration failed:', error);
+
       return {
         success: false,
         error: error.response?.data?.message || 'Đăng ký thất bại'
