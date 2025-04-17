@@ -2,15 +2,15 @@ import React from 'react';
 import { FiFilter } from 'react-icons/fi';
 import Select from 'react-select';
 
-const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onSizeToggle }) => {
+const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onSizeToggle, products, setFilteredProducts }) => {
   const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Black', 'White'];
   const sizes = ['S', 'M', 'L', 'XL'];
   const priceRanges = [
-    { value: '', label: 'All Prices' },
-    { value: '0-50', label: 'Under $50' },
-    { value: '50-100', label: '$50 - $100' },
-    { value: '100-200', label: '$100 - $200' },
-    { value: '200+', label: 'Over $200' }
+    { value: '', label: 'Tất cả giá' },
+    { value: '0-100000', label: 'Dưới 100,000đ' },
+    { value: '100000-500000', label: '100,000đ - 500,000đ' },
+    { value: '500000-1000000', label: '500,000đ - 1,000,000đ' },
+    { value: '1000000+', label: 'Trên 1,000,000đ' }
   ];
 
   const customStyles = {
@@ -29,7 +29,7 @@ const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onS
       borderColor: '#d1d5db',
       '&:hover': {
         borderColor: '#3b82f6',
-      },
+      },  
     }),
     menu: (provided) => ({
       ...provided,
@@ -45,6 +45,8 @@ const FilterSidebar = ({ filters, categories, onFilterChange, onColorToggle, onS
       label: category.name
     }))
   ];
+
+  
 
   return (
     <div className="w-1/3 bg-white p-4 rounded-lg shadow">

@@ -10,7 +10,8 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
   // Ensure all price calculations use valid numbers
   const calculatePrices = () => {
     const basePrice = Number(product.price) || 0;
-    const saleDiscount = Number(product.sale_price) || 0;
+    const salePrice = Number(product.sale_price) || 0;
+    const saleDiscount = basePrice > 0 ? ((basePrice - salePrice) / basePrice) * 100 : 0;
     const qty = Number(quantity) || 1;
 
     const discountedPrice = basePrice * (1 - saleDiscount / 100);
@@ -22,6 +23,14 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
       total
     };
   };
+
+  const calculateDiscount = (price, sale_price) => {
+    if (price && sale_price) {
+        const discountPercentage = ((price - sale_price) / price) * 100;
+        return discountPercentage.toFixed(0); 
+    }
+    return 0;
+}
 
   const { basePrice, discountedPrice, total } = calculatePrices();
 
@@ -93,6 +102,8 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
   const currentStock = getSelectedVariantStock();
   const totalStock = getTotalStock();
   
+ 
+
   return (
     <div className="md:w-full">
       <h2 className="text-xl font-bold  text-gray-700 text-left">{product.name}</h2>
@@ -115,7 +126,7 @@ const ProductInfo = ({ product, selectedColor, selectedSize, onSizeChange, onCol
               {formatPrice(basePrice)}
             </span>
             <span className="bg-red-500 text-white px-2 py-1 rounded-md text-sm">
-              -{product.sale_price}%
+              -{calculateDiscount(product.price, product.sale_price)}%
             </span>
           </>
         )}

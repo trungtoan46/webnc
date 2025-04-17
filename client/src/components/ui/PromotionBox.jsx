@@ -15,6 +15,10 @@ const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize,
       toast.error('Vui lòng chọn màu sắc');
       return;
     }
+    if (quantity > currentStock) {
+      toast.warn('Số lượng yêu cầu vượt quá số lượng tồn kho!');
+      return;
+    }
 
     if (!selectedSize) {
       toast.error('Vui lòng chọn kích thước');
@@ -40,9 +44,23 @@ const PromotionBox = ({ promoCode, product, isCart, selectedColor, selectedSize,
       toast.error('Thêm vào giỏ hàng thất bại. Vui lòng thử lại.');
     }
   };
-  
+
+  const getSelectedVariantStock = () => {
+    if (!selectedColor || !selectedSize || !Array.isArray(product.variants)) return 0;
+    
+    const selectedVariant = product.variants.find(
+      variant => variant.color === selectedColor && variant.size === selectedSize
+    );
+    
+    return selectedVariant ? selectedVariant.stock : 0;
+  };
+
+  const currentStock =getSelectedVariantStock();
+
+
   const handleQuantityChange = (value) => {
     
+
     if (typeof value === 'number') {
       const newQuantity = quantity + value;
       if (newQuantity > 0) {
