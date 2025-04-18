@@ -2,6 +2,16 @@ import React from 'react';
 import { FaHeart } from 'react-icons/fa';
 import { FaFire } from 'react-icons/fa';
 
+
+
+const calculateDiscount = (price, sale_price) => {
+  if (price && sale_price) {
+      const discountPercentage = ((price - sale_price) / price) * 100;
+      return discountPercentage.toFixed(0); 
+  }
+  return 0;
+}
+
 const ProductGrid = ({ products }) => {
   return (
     <div className="container mx-auto px-4">
@@ -39,9 +49,9 @@ const ProductGrid = ({ products }) => {
               <h3 className="font-medium mb-2">{product.name}</h3>
               
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-blue-600 font-bold">{product.salePrice.toLocaleString()}đ</span>
-                <span className="text-gray-400 line-through text-sm">{product.originalPrice.toLocaleString()}đ</span>
-                <span className="text-red-500 text-sm">-{product.discount}%</span>
+                <span className="text-blue-600 font-bold">{product.sale_price.toLocaleString()}đ</span>
+                <span className="text-gray-400 line-through text-sm">{product.price.toLocaleString()}đ</span>
+                <span className="text-red-500 text-sm">-{calculateDiscount(product.price, product.sale_price)}%</span>
               </div>
 
               <div className="flex items-center gap-2">

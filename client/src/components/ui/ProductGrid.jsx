@@ -3,7 +3,9 @@ import ProductCard from './ProductCard';
 import { useNavigate } from 'react-router-dom';
 
 const ProductGrid = ({ products, loading, onOpenPopup, onAddToCart }) => {
-  const navigate = useNavigate();
+
+  
+  
   return (
     <div className="lg:w-full min-h-[800px]">
       {/* View Mode Toggle */}

@@ -6,7 +6,15 @@ import { useNavigate } from 'react-router-dom';
 
 
 const ProductCard = ({ product, onOpenPopup, onAddToCart }) => {
+  console
   const navigate = useNavigate();
+  const calculateDiscount = (price, sale_price) => {
+    if (price && sale_price) {
+        const discountPercentage = ((price - sale_price) / price) * 100;
+        return discountPercentage.toFixed(0); 
+    }
+    return 0;
+}
   const triggerAnimation = () => {
     animate('.animate-slide-up', {
       y: {
@@ -33,7 +41,7 @@ const ProductCard = ({ product, onOpenPopup, onAddToCart }) => {
     >
       {product.discount > 0 && (
         <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md">
-          -{product.discount}%
+          {product.price}
         </div>
       )}
       <div 
@@ -114,10 +122,10 @@ const ProductCard = ({ product, onOpenPopup, onAddToCart }) => {
           )}
         </div>
         <div className="flex items-center gap-2 justify-between">
-          {product.discount > 0 ? (
+          {product.sale_price > 0 ? (
             <>
-              <span className="text-lg font-bold text-red-500">
-                {(product.price * (1 - product.discount / 100)).toLocaleString()}đ
+              <span className="text-[14px] font-bold text-red-500">
+                {product.sale_price.toLocaleString()}đ
               </span>
               <span className="text-sm text-[#155BF6] line-through">
                 {product.price.toLocaleString()}đ
