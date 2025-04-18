@@ -4,8 +4,11 @@ import { toast, ToastContainer } from 'react-toastify';
 import { FaArrowLeft, FaCreditCard, FaMoneyBill, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope } from 'react-icons/fa';
 import logo from '../assets/logo.webp';
 import api from '../services/api/api';
+import { useAuth } from '../context/AuthContext';
 
 const Checkout = () => {
+  const { user } = useAuth();
+  console.log(user);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',

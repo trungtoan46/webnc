@@ -8,7 +8,7 @@ const isAuthenticated = (req, res, next) => {
 
     try {
         const verified = jwt.verify(token, process.env.JWT_SECRET);
-
+        
 
         if (!verified.userId) {
             return res.status(400).json({ message: 'Invalid token: Missing user ID' });
