@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -38,3 +39,8 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+=======
+const uploadRouter = require('./routes/upload');
+
+app.use('/api/upload', uploadRouter); 
+>>>>>>> 3f9f6512593005bf41314b6fe23811e2b7fe22e0
