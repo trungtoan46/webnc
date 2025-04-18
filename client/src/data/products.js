@@ -1,72 +1,52 @@
 export const products = [
   {
-    id: 1,
-    name: 'Áo thun nam - Brown',
-    brand: 'KHÁC',
-    image: 'https://example.com/brown-tshirt.jpg', // Replace with actual image URL
-    salePrice: 599000,
-    originalPrice: 1300000,
-    discount: 54,
-    colors: ['#8B4513'], // Brown color
-    colorCount: 2,
-    isLiked: false,
-    isTrending: false,
-    soldCount: 192
+    "_id": "6801365dc54a9c8211b95c14",
+    "name": "Áo khoác nam - Black",
+    "name_slug": "ao-khoac-nam-black",
+    "price": 1399000,
+    "thumbnail": "https://res.cloudinary.com/dekwog3si/image/upload/v1744909915/products/cfpcamjrr2i6qjoagqg8.webp",
+    "sale_price": 789000,
+    "quantity": 16,
+    "is_active": true
   },
   {
-    id: 2,
-    name: 'Áo thun nam - Black',
-    brand: 'KHÁC',
-    image: 'https://example.com/black-tshirt.jpg', // Replace with actual image URL
-    salePrice: 599000,
-    originalPrice: 1300000,
-    discount: 54,
-    colors: ['#000000'], // Black color
-    colorCount: 11,
-    isLiked: false,
-    isTrending: true,
-    soldCount: 177
+    "_id": "680136d7c54a9c8211b95c22",
+    "name": "Áo khoác nam - Brown",
+    "name_slug": "ao-khoac-nam-brown",
+    "price": 1399000,
+    "thumbnail": "https://res.cloudinary.com/dekwog3si/image/upload/v1744910038/products/juwdw6qurd2zhvvetthi.png",
+    "sale_price": 789000,
+    "quantity": 16,
+    "is_active": true
   },
   {
-    id: 3,
-    name: 'Áo thun nam - Cream',
-    brand: 'KHÁC',
-    image: 'https://example.com/cream-tshirt.jpg', // Replace with actual image URL
-    salePrice: 599000,
-    originalPrice: 1300000,
-    discount: 54,
-    colors: ['#FFFDD0'], // Cream color
-    colorCount: 2,
-    isLiked: true,
-    isTrending: false,
-    soldCount: 0
+    "_id": "68013715c54a9c8211b95c26",
+    "name": "Áo khoác nam - Grey",
+    "name_slug": "ao-khoac-nam-grey",
+    "price": 1399000,
+    "thumbnail": "https://res.cloudinary.com/dekwog3si/image/upload/v1744910099/products/qjnk3ryrhzhzgjwf9nmm.png",
+    "sale_price": 789000,
+    "quantity": 16,
+    "is_active": true
   },
   {
-    id: 4,
-    name: 'Áo thun nam - Green',
-    brand: 'KHÁC',
-    image: 'https://example.com/green-tshirt.jpg', // Replace with actual image URL
-    salePrice: 399000,
-    originalPrice: 1300000,
-    discount: 70,
-    colors: ['#006400'], // Dark green color
-    colorCount: 2,
-    isLiked: true,
-    isTrending: false,
-    soldCount: 153
+    "_id": "68013778c54a9c8211b95c2a",
+    "name": "Áo len nam - Black",
+    "name_slug": "ao-len-nam-black",
+    "price": 1399000,
+    "thumbnail": "https://res.cloudinary.com/dekwog3si/image/upload/v1744910198/products/p8shhwfepj0uibtkkxmj.webp",
+    "sale_price": 789000,
+    "quantity": 12,
+    "is_active": true
   },
   {
-    id: 5,
-    name: 'Áo thun nam - White',
-    brand: 'KHÁC',
-    image: 'https://example.com/white-tshirt.jpg', // Replace with actual image URL
-    salePrice: 599000,
-    originalPrice: 1300000,
-    discount: 54,
-    colors: ['#FFFFFF'], // White color
-    colorCount: 2,
-    isLiked: false,
-    isTrending: false,
-    soldCount: 195
+    "_id": "680137cac54a9c8211b95c2e",
+    "name": "Áo len nam - Brown",
+    "name_slug": "ao-len-nam-brown",
+    "price": 1399000,
+    "thumbnail": "https://res.cloudinary.com/dekwog3si/image/upload/v1744910279/products/hzwplknjfe66w1wktdmv.webp",
+    "sale_price": 789000,
+    "quantity": 8,
+    "is_active": true
   }
-]; 
+];

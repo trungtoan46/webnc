@@ -37,10 +37,13 @@ const Home = () => {
     }
   ];
 
+  // Filter sale products for FlashSale component
+  const saleProducts = products?.filter(product => product.sale_price > 0)?.slice(0, 5) || [];
+  
   return (
     <div className='w-full'>
       <div className="flex-1">
-        <FlashSale />
+        <FlashSale products={saleProducts} />
         <ProductGrid products={products} />
         <ProductCollection categories={categories} />
         <CouponSection />

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import '../styles/FlashSale.css';
-const FlashSale = () => {
+import { Link } from 'react-router-dom';
+
+const FlashSale = ({ products }) => {
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
     minutes: 0,
@@ -29,57 +31,70 @@ const FlashSale = () => {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div className="d-flex align-items-center flex-wrap flashsale__header justify-content-between">
-      <div className="flash-sale-heading">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <h2 className="heading-bar__title flashsale__title m-0">
-            <a className="link" href="/collections/hot-products" title="GIẢM SỐC 50%">
-              GIẢM SỐC 50%
-            </a>
-            <span className="ega-dot">
-              <span className="ega-ping"></span>
-            </span>
-          </h2>
-          <img
-            style={{ maxHeight: "55px" }}
-            width="50"
-            height="50"
-            alt="GIẢM SỐC 50%"
-            src="//theme.hstatic.net/200000696635/1001257291/14/flashsale-hot.png?v=107"
-          />
-        </div>
-      </div>
+  const calculateDiscount = (price, sale_price) => {
+    if (!price || !sale_price) return 0;
+    if (price && sale_price) {
+      return Math.round(((price - sale_price) / price) * 100);
+    }
+    return 0;
+  };
 
-      <div className="flashsale__countdown-wrapper">
-        <span className="flashsale__countdown-label">Kết thúc sau</span>
-        <div className="flashsale__countdown">
-          <div className="ega-badge-ctd">
-            <div>
-              <div className="ega-badge-ctd__item ega-badge-ctd__h text-gray-800">
-                {String(timeLeft.hours).padStart(2, "0")}
+  return (
+    <div className="flash-sale-container bg-white p-4 rounded-lg mb-8">
+      <div className="d-flex align-items-center flex-wrap flashsale__header justify-content-between mb-6">
+        <div className="flash-sale-heading">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <h2 className="heading-bar__title flashsale__title m-0">
+              <a className="link" href="/collections/hot-products" title="GIẢM SỐC 50%">
+                GIẢM SỐC 50%
+              </a>
+              <span className="ega-dot">
+                <span className="ega-ping"></span>
+              </span>
+            </h2>
+            <img
+              style={{ maxHeight: "55px" }}
+              width="50"
+              height="50"
+              alt="GIẢM SỐC 50%"
+              src="//theme.hstatic.net/200000696635/1001257291/14/flashsale-hot.png?v=107"
+            />
+          </div>
+        </div>
+
+        <div className="flashsale__countdown-wrapper">
+          <span className="flashsale__countdown-label">Kết thúc sau</span>
+          <div className="flashsale__countdown">
+            <div className="ega-badge-ctd">
+              <div>
+                <div className="ega-badge-ctd__item ega-badge-ctd__h text-gray-800">
+                  {String(timeLeft.hours).padStart(2, "0")}
+                </div>
+                <span className="text-gray-800">Giờ</span>
               </div>
-              <span className="text-gray-800">Giờ</span>
-            </div>
-            <div className="ega-badge-ctd__colon">:</div>
-            <div>
-              <div className="ega-badge-ctd__item ega-badge-ctd__m text-gray-800">
-                {String(timeLeft.minutes).padStart(2, "0")}
+              <div className="ega-badge-ctd__colon">:</div>
+              <div>
+                <div className="ega-badge-ctd__item ega-badge-ctd__m text-gray-800">
+                  {String(timeLeft.minutes).padStart(2, "0")}
+                </div>
+                <span className="text-gray-800">Phút</span>
               </div>
-              <span className="text-gray-800">Phút</span>
-            </div>
-            <div className="ega-badge-ctd__colon">:</div>
-            <div>
-              <div className="ega-badge-ctd__item ega-badge-ctd__s text-gray-800">
-                {String(timeLeft.seconds).padStart(2, "0")}
+              <div className="ega-badge-ctd__colon">:</div>
+              <div>
+                <div className="ega-badge-ctd__item ega-badge-ctd__s text-gray-800">
+                  {String(timeLeft.seconds).padStart(2, "0")}
+                </div>
+                <span className="text-gray-800">Giây</span>
               </div>
-              <span className="text-gray-800">Giây</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Products Grid */}
+
     </div>
   );
 };
 
-export default FlashSale; 
+export default FlashSale;
