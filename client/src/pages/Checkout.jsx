@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 
 const Checkout = () => {
   const { user } = useAuth();
-  console.log(user);
+  const userId = user._id;
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -100,10 +100,10 @@ const Checkout = () => {
 
         return productData;
       });
-
+      
       // Tạo đơn hàng mới
       const orderData = {
-        user: localStorage.getItem('userId'),
+        user: userId,
         products: orderItems,
         shippingInfo: {
           fullName: formData.fullName,

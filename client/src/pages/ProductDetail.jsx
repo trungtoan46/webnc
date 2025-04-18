@@ -245,16 +245,11 @@ const ProductDetail = () => {
   
   // Thêm các ảnh chi tiết nếu có
   if (product.detail_images) {
-    // Log để debug
-    console.log('Detail Images Type:', typeof product.detail_images);
-    console.log('Detail Images Value:', product.detail_images);
-    
     // Nếu detail_images là mảng, thêm từng ảnh vào
     if (Array.isArray(product.detail_images)) {
       // Đảm bảo loại bỏ các giá trị null, undefined hoặc chuỗi rỗng
       const validDetailImages = product.detail_images.filter(img => img && img !== '');
       allImages = [...allImages, ...validDetailImages];
-      console.log('Valid Detail Images:', validDetailImages);
     } 
     // Nếu detail_images là chuỗi, thêm trực tiếp
     else if (typeof product.detail_images === 'string' && product.detail_images !== '') {
@@ -264,12 +259,6 @@ const ProductDetail = () => {
   
   // Đảm bảo không có ảnh trùng lặp và lọc ra các ảnh null hoặc undefined
   const images = [...new Set(allImages)].filter(Boolean);
-  
-  // Debug log - kiểm tra mảng hình ảnh
-  console.log('Thumbnail:', product.thumbnail);
-  console.log('Detail Images:', product.detail_images);
-  console.log('All Images:', allImages);
-  console.log('Final Images Array:', images);
   
   // Lấy size và color từ variants của sản phẩm
   let availableSizes = [];
@@ -284,9 +273,6 @@ const ProductDetail = () => {
     availableSizes = [...new Set(availableVariants.map(v => v.size))];
     availableColors = [...new Set(availableVariants.map(v => v.color))];
     
-    console.log('Available Variants:', availableVariants);
-    console.log('Available Sizes:', availableSizes);
-    console.log('Available Colors:', availableColors);
   } else {
     // Nếu không có variants, sử dụng size và color từ sản phẩm
     availableSizes = product.size ? (typeof product.size === 'string' ? product.size.split(',') : product.size) : [];

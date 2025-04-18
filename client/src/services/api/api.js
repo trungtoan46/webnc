@@ -92,7 +92,7 @@ const addToCart = async ({ productId, quantity }) => {
 
 // Lấy thông tin giỏ hàng
 const getCart = async () => {
-  try {
+  try { 
     const response = await api.get('/cart');
     return response.data;
   } catch (error) {
@@ -159,8 +159,22 @@ const getEvents = async () => {
   }
 };
 
-
-
+// Hàm để lấy thông tin user từ token
+const getUserInfoFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  
+  try {
+    // Lấy phần payload của token (phần thứ 2 trong chuỗi JWT)
+    const payload = token.split('.')[1];
+    // Decode base64 để lấy thông tin user
+    const decodedInfo = JSON.parse(atob(payload));
+    return decodedInfo;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return null;
+  }
+};
 
 export default api;
 
@@ -173,5 +187,6 @@ export {
   createProduct,
   updateProduct,
   deleteProduct,
-  getEvents
-}; 
+  getEvents,
+  getUserInfoFromToken
+};
