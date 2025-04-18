@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { bool } = require('prop-types');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 
@@ -47,8 +48,8 @@ const UserSchema = new mongoose.Schema({
         default: '',
     },
     active:{
-        type:String,
-        default:"active"
+        type:Boolean,
+        default:true
     }
 });
 UserSchema.plugin(AutoIncrement, { inc_field: 'user_id' });

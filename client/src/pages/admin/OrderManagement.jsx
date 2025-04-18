@@ -70,7 +70,6 @@ const OrderManagement = () => {
     }
   }, [orders]);
 
-  console.log(user);
 
  
 

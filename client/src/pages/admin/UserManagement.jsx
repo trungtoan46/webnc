@@ -29,26 +29,51 @@ const UserManagement = () => {
 
   const updateUserRole = async (userId, newRole) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/admin/users/${userId}/role`, {
-        role: newRole
-      },{
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      // Kiểm tra xem newRole có hợp lệ không
+      if (!newRole || (newRole !== 'admin' && newRole !== 'user')) {
+        toast.error('Invalid role selected');
+        return;
+      }
+  
+      // Gửi yêu cầu PUT để cập nhật role người dùng
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/admin/users/${userId}`, 
+        { role: newRole }, // Gửi role mới
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}` // Gửi token trong header
+          }
         }
-      });
+      );
+  
+      // Nếu thành công, hiển thị thông báo thành công và gọi lại hàm fetchUsers để làm mới danh sách người dùng
       toast.success('User role updated successfully');
       fetchUsers(); // Refresh the users list
+      console.log(response)
     } catch (error) {
       console.error('Error updating user role:', error);
       toast.error('Error updating user role');
     }
   };
+  
 
   const toggleUserStatus = async (userId, currentStatus) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/users/${userId}/status`, {
+      const response= await axios.put(`
+        ${import.meta.env.VITE_API_URL}/admin/users/${userId}`,
+        
+      {
         active: !currentStatus
-      });
+      },
+      {
+        headers: {
+           'Authorization': `Bearer ${localStorage.getItem('token')}`
+         }
+       },
+    
+    );
+    console.log('Cập nhật trạng thái người dùng thành công:', response.data);
+
       toast.success('User status updated successfully');
       fetchUsers(); // Refresh the users list
     } catch (error) {
@@ -57,7 +82,6 @@ const UserManagement = () => {
     }
   };
 
-  console.log(users)
 
   if (loading) {
     return (

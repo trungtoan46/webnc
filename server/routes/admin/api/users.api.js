@@ -41,7 +41,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { role, status } = req.body;  
+        const { role, active } = req.body;  
 
         // Kiểm tra không cho phép admin hạ cấp chính mình
         if (id === req.user.userId && role && role !== 'admin') {
@@ -51,7 +51,7 @@ router.put('/:id', async (req, res) => {
           });
         }
 
-        const user = await User.findByIdAndUpdate(id, { role, status }, { new: true });
+        const user = await User.findByIdAndUpdate(id, { role, active }, { new: true });
         
         if (!user) {
           return res.status(404).json({
