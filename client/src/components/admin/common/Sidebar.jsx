@@ -21,7 +21,7 @@ const Sidebar = ({ sidebarActive, setSidebarActive }) => {
     { id: 'products', label: 'Sản phẩm', icon: <FiBox size={20} /> },
     { id: 'categories', label: 'Danh mục', icon: <FiList size={20}/> },
     { id: 'orders', label: 'Đơn hàng', icon: <FiShoppingCart size={20}/> },
-    { id: 'customers', label: 'Khách hàng', icon: <FiUser size={20} /> },
+    { id: 'users', label: 'Khách hàng', icon: <FiUser size={20} /> },
     { id: 'events', label: 'Sự kiện', icon: <FiCalendar size={20} /> },
     { id: 'analytics', label: 'Analytics', icon: <FiBarChart2 size={20} /> },
     { id: 'settings', label: 'Cài đặt', icon: <FiSettings size={20} /> }

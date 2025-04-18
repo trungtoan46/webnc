@@ -6,6 +6,9 @@ import Products from './admin/Products';
 import Categories from './admin/Categories';
 import AdminEvent from './admin/AdminEvent';
 import { FiMenu } from 'react-icons/fi';
+import OrderManagement from './admin/OrderManagement';
+import UserManagement from './admin/UserManagement';
+
 
 const Admin = () => {
     // Khai báo các state cần thiết
@@ -90,6 +93,10 @@ const Admin = () => {
                 return <Categories />;
             case 'events':
                 return <AdminEvent />;
+            case 'orders':
+                return <OrderManagement />;
+            case 'users':
+                return <UserManagement />;
             default:
                 return (
                     <div className="p-6 w-full">

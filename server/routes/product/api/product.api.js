@@ -1,11 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { Product } = require('../../../models/index.model');
-<<<<<<< HEAD
-=======
-const auth = require('../../../middleware/auth');
-
->>>>>>> 3f9f6512593005bf41314b6fe23811e2b7fe22e0
 
 // Get all products with filters and pagination
 router.get('/', async (req, res) => {

@@ -27,6 +27,9 @@ import CheckOrder from './pages/CheckOrder'
 import Profile from './pages/profile/Profile'
 import EditProfile from './pages/EditProfile'
 import Search from './pages/Search'
+import OrderManagement from './pages/admin/OrderManagement'
+import UserManagement from './pages/admin/UserManagement'
+
 
 function App() {
   return (
