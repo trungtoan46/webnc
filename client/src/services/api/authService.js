@@ -23,7 +23,6 @@ export const login = async (email, password) => {
     if (response.status >= 400) {
       throw new Error(response.data.message || "Email hoặc mật khẩu không chính xác");
     }
-    console.log('Login response:', response.data); // Log response from server
 
     // Kiểm tra và lưu token
     if (response.data && response.data.token) {
@@ -60,7 +59,6 @@ export const logout = () => {
 export const getCurrentUser = async () => {
   try {
     const response = await api.get("/auth/me");
-    console.log('Current user response:', response.data); // Log response from server
     return response.data;
   } catch (error) {
     console.error("Error fetching user info:", error.response?.data || error.message);
