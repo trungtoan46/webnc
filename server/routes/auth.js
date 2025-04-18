@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
 
 router.post('/login', async (req, res) => {
@@ -17,29 +18,24 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
     }
 
-    // Set session data
-    req.session.user = {
-      id: user._id,
-      email: user.email,
-      role: user.role
-    };
+    // Create JWT token
+    const token = jwt.sign(
+      { 
+        userId: user._id,
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-    // Save session before sending response
-    req.session.save((err) => {
-      if (err) {
-        console.error('Session save error:', err);
-        return res.status(500).json({ message: 'Lỗi đăng nhập' });
+    // Send response with user data and token
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role
       }
-
-      // Send response with user data and session ID
-      res.json({
-        user: {
-          id: user._id,
-          email: user.email,
-          role: user.role
-        },
-        sessionID: req.sessionID
-      });
     });
 
   } catch (error) {
@@ -48,29 +44,31 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Check session status
-router.get('/check-session', (req, res) => {
-  if (req.session.user) {
-    res.json({ 
-      isAuthenticated: true, 
-      user: req.session.user 
-    });
-  } else {
-    res.json({ 
-      isAuthenticated: false 
-    });
+// Get current user info
+router.get('/me', async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(401).json({ message: 'Invalid token' });
   }
 });
 
 // Logout route
 router.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ message: 'Lỗi đăng xuất' });
-    }
-    res.clearCookie('connect.sid');
-    res.json({ message: 'Đăng xuất thành công' });
-  });
+  res.json({ message: 'Đăng xuất thành công' });
 });
 
 module.exports = router; 

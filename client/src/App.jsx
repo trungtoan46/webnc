@@ -26,6 +26,7 @@ import OrderDetail from './pages/OrderDetail'
 import CheckOrder from './pages/CheckOrder'
 import Profile from './pages/profile/Profile'
 import EditProfile from './pages/EditProfile'
+import Search from './pages/Search'
 
 function App() {
   return (
@@ -126,6 +127,12 @@ function App() {
                 <Route path="/profile/edit" element={
                   <MainLayout showHeader={true} showFooter={true}>
                     <EditProfile />
+                  </MainLayout>
+                } />
+                {/* Search Route */}
+                <Route path="/search" element={
+                  <MainLayout showBanner={true}>
+                    <Search />
                   </MainLayout>
                 } />
               </Routes>

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const ProductCard = ({ product, onOpenPopup, onAddToCart }) => {
-  console
+  
   const navigate = useNavigate();
   const calculateDiscount = (price, sale_price) => {
     if (price && sale_price) {
