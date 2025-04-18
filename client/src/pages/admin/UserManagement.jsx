@@ -13,8 +13,12 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`);
-      setUsers(response.data);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/users`,{
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setUsers(response.data.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -25,8 +29,12 @@ const UserManagement = () => {
 
   const updateUserRole = async (userId, newRole) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/users/${userId}/role`, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/admin/users/${userId}/role`, {
         role: newRole
+      },{
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
       toast.success('User role updated successfully');
       fetchUsers(); // Refresh the users list
@@ -48,6 +56,8 @@ const UserManagement = () => {
       toast.error('Error updating user status');
     }
   };
+
+  console.log(users)
 
   if (loading) {
     return (
@@ -87,20 +97,27 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
+            {Array.isArray(users) && users.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center py-4 text-gray-500">
+                  Không có người dùng nào.
+                </td>
+              </tr>
+            ) : (
+              users.map((user) => (
                 <tr key={user._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <img 
                           className="h-10 w-10 rounded-full" 
-                          src={user.avatar || 'https://via.placeholder.com/40'} 
+                          src={user.avatar || 'https://media.istockphoto.com/id/1223671392/vi/vec-to/%E1%BA%A3nh-h%E1%BB%93-s%C6%A1-m%E1%BA%B7c-%C4%91%E1%BB%8Bnh-h%C3%ACnh-%C4%91%E1%BA%A1i-di%E1%BB%87n-ch%E1%BB%97-d%C3%A0nh-s%E1%BA%B5n-cho-%E1%BA%A3nh-minh-h%E1%BB%8Da-vect%C6%A1.jpg?s=612x612&w=0&k=20&c=l9x3h9RMD16-z4kNjo3z7DXVEORzkxKCMn2IVwn9liI='} 
                           alt="" 
                         />
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {user.name}
+                          {user.username}
                         </div>
                       </div>
                     </div>
@@ -120,7 +137,7 @@ const UserManagement = () => {
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {format(new Date(user.createdAt), 'dd/MM/yyyy')}
+                  {user.created_at ? format(new Date(user.created_at), 'dd/MM/yyyy') : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -140,8 +157,10 @@ const UserManagement = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              ))
+            )}
+          </tbody>
+
           </table>
         </div>
       </div>

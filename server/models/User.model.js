@@ -46,6 +46,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    active:{
+        type:String,
+        default:"active"
+    }
 });
 UserSchema.plugin(AutoIncrement, { inc_field: 'user_id' });
 
